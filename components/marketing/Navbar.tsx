@@ -10,8 +10,8 @@ export function Navbar() {
     <nav className="sticky top-0 z-50 bg-bg border-b border-[var(--border)]">
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="font-display font-black text-teal text-xl tracking-widest">
-          GIGLZ
+        <Link href="/" className="font-display font-black bg-gradient-to-r from-teal to-pink bg-clip-text text-transparent text-xl tracking-widest">
+          GiGLz
         </Link>
 
         {/* Desktop nav */}
