@@ -25,39 +25,39 @@ export function HeroSection() {
       {/* Content sits above glow via relative + z-index */}
       <div className="relative z-10 flex flex-col items-center text-center w-full">
 
-      {/* Headline */}
-      <h1
-        className="font-display font-black text-white text-center mb-4"
-        style={{ fontSize: 'clamp(2rem, 5vw, 4rem)', lineHeight: 1.1 }}
-      >
-        Turn Any Party Unforgettable
-      </h1>
-
-      {/* Subhead */}
-      <p className="text-[var(--text-secondary)] font-medium text-base mb-8 max-w-[480px]">
-        No App Store. No Downloads. Click &amp; Play. 200+ cards, 6 challenges.
-      </p>
-
-      {/* Card mockup */}
-      <div className="w-full max-w-xs mx-auto pointer-events-none mb-8">
-        <GameCard cardId={42} />
-      </div>
-
-      {/* CTAs */}
-      <div className="flex flex-wrap gap-3 justify-center">
-        <Link href="/play">
-          <Button variant="primary">Play Free →</Button>
-        </Link>
-        <Button
-          variant="secondary"
-          className="opacity-40"
-          disabled
-          title="Coming soon"
-          style={{ cursor: 'not-allowed', pointerEvents: 'none' }}
+        {/* Headline */}
+        <h1
+          className="font-display font-black text-white text-center mb-4"
+          style={{ fontSize: 'clamp(2rem, 5vw, 4rem)', lineHeight: 1.1 }}
         >
-          Get Plus
-        </Button>
-      </div>
+          Turn Any Party Unforgettable
+        </h1>
+
+        {/* Subhead */}
+        <p className="text-[var(--text-secondary)] font-medium text-base mb-8 max-w-[480px]">
+          No App Store. No Downloads. Click &amp; Play. 200+ cards, 6 challenges.
+        </p>
+
+        {/* Card mockup */}
+        <div className="w-full max-w-xs mx-auto pointer-events-none mb-8">
+          <GameCard cardId={42} />
+        </div>
+
+        {/* CTAs */}
+        <div className="flex flex-wrap gap-3 justify-center">
+          <Link href="/play">
+            <Button variant="primary">Play Free →</Button>
+          </Link>
+          <Button
+            variant="secondary"
+            className="opacity-40"
+            disabled
+            title="Coming soon"
+            style={{ cursor: 'not-allowed', pointerEvents: 'none' }}
+          >
+            Get Plus
+          </Button>
+        </div>
       </div> {/* end relative z-10 content wrapper */}
     </section>
   )
