@@ -241,6 +241,9 @@ export interface ChallengeType {
   timed: boolean   // false only for Dares
 }
 
+// NOTE: desc values below are the final UI copy for the ModeStrip, intentionally more
+// detailed than the spec's brief descriptions. Die 6 label is 'Dare' (singular) not 'Dares'.
+// These are the authoritative values for the app.
 export const DIE_MAP: Record<DieValue, ChallengeType> = {
   1: { type: 'words',        label: 'Words',        desc: 'Explain without saying the word. No parts, no rhymes, no spelling!', color: '#EA6CAE', timed: true  },
   2: { type: 'cliche',       label: 'Cliché',       desc: 'Describe using only its most famous traits — without naming it!',   color: '#7ADDDA', timed: true  },
@@ -255,10 +258,54 @@ export function cardImagePath(id: number): string {
 }
 ```
 
-- [ ] **Step 3: Commit**
+- [ ] **Step 3: Write `__tests__/game/cards.test.ts`**
+
+> Note: requires Jest to be configured (done in Task 3, Step 1). Skip ahead to Task 3 Step 1 first if running in order, then return here.
+
+```ts
+import { ALL_CARD_IDS, FREE_CARD_LIMIT, DIE_MAP, cardImagePath } from '@/lib/game/cards'
+
+describe('ALL_CARD_IDS', () => {
+  it('contains exactly 75 IDs from 26 to 100', () => {
+    expect(ALL_CARD_IDS).toHaveLength(75)
+    expect(ALL_CARD_IDS[0]).toBe(26)
+    expect(ALL_CARD_IDS[74]).toBe(100)
+  })
+})
+
+describe('FREE_CARD_LIMIT', () => {
+  it('is 15', () => {
+    expect(FREE_CARD_LIMIT).toBe(15)
+  })
+})
+
+describe('DIE_MAP', () => {
+  it('has entries for dice 1 through 6', () => {
+    for (let d = 1; d <= 6; d++) {
+      expect(DIE_MAP[d as 1|2|3|4|5|6]).toBeDefined()
+    }
+  })
+
+  it('only die 6 (Dare) has timed=false', () => {
+    expect(DIE_MAP[6].timed).toBe(false)
+    for (let d = 1; d <= 5; d++) {
+      expect(DIE_MAP[d as 1|2|3|4|5].timed).toBe(true)
+    }
+  })
+})
+
+describe('cardImagePath', () => {
+  it('returns correct path for a given card ID', () => {
+    expect(cardImagePath(26)).toBe('/cards/26.png')
+    expect(cardImagePath(100)).toBe('/cards/100.png')
+  })
+})
+```
+
+- [ ] **Step 4: Commit**
 
 ```bash
-git add lib/game/cards.ts public/cards/60.png
+git add lib/game/cards.ts public/cards/60.png __tests__/game/cards.test.ts
 git commit -m "feat: add card data (DIE_MAP, card IDs) and fix card filename"
 ```
 
@@ -643,7 +690,22 @@ git commit -m "feat: game engine with Fisher-Yates shuffle, solo/team scoring, w
 - Create: `components/ui/Toast.tsx`
 - Create: `components/ui/Badge.tsx`
 
-- [ ] **Step 1: Create `components/ui/Button.tsx`**
+- [ ] **Step 1: Create `lib/utils.ts`** (must come before Button.tsx which imports it)
+
+```ts
+import { type ClassValue, clsx } from 'clsx'
+import { twMerge } from 'tailwind-merge'
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
+```
+
+```bash
+npm install clsx tailwind-merge
+```
+
+- [ ] **Step 2: Create `components/ui/Button.tsx`**
 
 ```tsx
 import { ButtonHTMLAttributes } from 'react'
@@ -680,32 +742,32 @@ export function Button({ variant = 'primary', className, children, ...props }: B
 }
 ```
 
-- [ ] **Step 2: Create `lib/utils.ts`**
-
-```ts
-import { type ClassValue, clsx } from 'clsx'
-import { twMerge } from 'tailwind-merge'
-
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
-}
-```
-
-```bash
-npm install clsx tailwind-merge
-```
-
 - [ ] **Step 3: Create `components/ui/Badge.tsx`**
 
 ```tsx
 import { DIE_MAP, DieValue } from '@/lib/game/cards'
+
+// WCAG AA text colours per die background:
+// Die 1 (#EA6CAE pink) → black (5.1:1)
+// Die 2 (#7ADDDA teal) → black (7.9:1)
+// Die 3 (#68519E purple) → white is ~3.1:1 — use lighter purple variant for badge bg
+// Die 4 (#3097D1 blue) → white (3.8:1 large/bold text acceptable)
+// Die 5 (#7ADDDA teal) → black
+// Die 6 (#EA6CAE pink) → black
+const DIE_TEXT_COLOR: Record<DieValue, string> = {
+  1: '#000', 2: '#000', 3: '#fff', 4: '#fff', 5: '#000', 6: '#000'
+}
+const DIE_BG_COLOR: Record<DieValue, string> = {
+  1: '#EA6CAE', 2: '#7ADDDA', 3: '#8B70CC', // lightened purple for WCAG AA
+  4: '#3097D1', 5: '#7ADDDA', 6: '#EA6CAE'
+}
 
 export function Badge({ die }: { die: DieValue }) {
   const challenge = DIE_MAP[die]
   return (
     <span
       className="inline-flex items-center text-[10px] font-bold rounded-full px-3 py-1"
-      style={{ background: challenge.color, color: die === 2 || die === 5 ? '#000' : '#fff' }}
+      style={{ background: DIE_BG_COLOR[die], color: DIE_TEXT_COLOR[die] }}
     >
       {challenge.label}
     </span>
@@ -844,6 +906,7 @@ export function ModeStrip({ dieValue, singleTaskDie }: ModeStripProps) {
 'use client'
 import { useState } from 'react'
 import { DieValue } from '@/lib/game/cards'
+import { rollDie } from '@/lib/game/engine'
 
 interface DieProps {
   value: DieValue | null
@@ -858,7 +921,7 @@ export function Die({ value, onRoll, disabled }: DieProps) {
     if (disabled || rolling) return
     setRolling(true)
     setTimeout(() => {
-      const rolled = (Math.floor(Math.random() * 6) + 1) as DieValue
+      const rolled = rollDie()
       setRolling(false)
       onRoll(rolled)
     }, 600)
@@ -1329,10 +1392,13 @@ import { WinnerScreen } from '@/components/game/WinnerScreen'
 import { Button } from '@/components/ui/Button'
 import { Toast } from '@/components/ui/Toast'
 import {
-  GameState, createGame, drawCard, scoreCard,
+  GameState, CreateGameOptions, createGame, rollDie, drawCard, scoreCard,
   skipCard, nextTurn, checkWin
 } from '@/lib/game/engine'
 import { ALL_CARD_IDS, FREE_CARD_LIMIT, DIE_MAP, DieValue } from '@/lib/game/cards'
+
+// GameOptions matches what PlayerSetup passes via onStart (no cardIds — added here)
+type GameOptions = Omit<CreateGameOptions, 'cardIds'>
 
 export default function PlayPage() {
   const [gameState, setGameState] = useState<GameState | null>(null)
@@ -1345,7 +1411,7 @@ export default function PlayPage() {
   const isPlusPro = false
   const cardLimit = isPlusPro ? ALL_CARD_IDS.length : FREE_CARD_LIMIT
 
-  function handleStart(opts: Parameters<typeof createGame>[0]) {
+  function handleStart(opts: GameOptions) {
     const cardIds = isPlusPro ? ALL_CARD_IDS : ALL_CARD_IDS.slice(0, cardLimit)
     const state = createGame({ ...opts, cardIds })
     setGameState(state)
@@ -1380,12 +1446,16 @@ export default function PlayPage() {
     setGameState(next)
   }
 
+  // Inline skip logic to avoid stale closure — do not call handleSkip() here
   const handleTimerExpire = useCallback(() => {
-    handleSkip()
-  }, [gameState])
+    setGameState(prev => {
+      if (!prev) return prev
+      return nextTurn(skipCard(prev))
+    })
+  }, [])
 
   if (!gameState) return <PlayerSetup isPlusPro={isPlusPro} onStart={handleStart} />
-  if (winner) return <WinnerScreen state={gameState} winner={winner} onPlayAgain={() => handleStart({ mode: gameState.mode, players: gameState.players, teams: gameState.teams, cardIds: ALL_CARD_IDS.slice(0, cardLimit), cardsToWin: gameState.cardsToWin, timerEnabled: gameState.timerEnabled })} onNewGame={() => setGameState(null)} />
+  if (winner) return <WinnerScreen state={gameState} winner={winner} onPlayAgain={() => handleStart({ mode: gameState.mode, players: gameState.players, teams: gameState.teams, cardsToWin: gameState.cardsToWin, timerEnabled: gameState.timerEnabled })} onNewGame={() => setGameState(null)} />
 
   const isDare = gameState.dieValue === 6
   const currentPlayerName = gameState.mode === 'solo'
@@ -1433,7 +1503,7 @@ export default function PlayPage() {
         {gameState.phase === 'rolling' ? (
           <div className="flex flex-col items-center gap-4">
             {!gameState.singleTaskMode && <Die value={gameState.dieValue} onRoll={handleRoll} />}
-            <Button variant="roll" onClick={() => handleRoll((Math.floor(Math.random() * 6) + 1) as DieValue)}>
+            <Button variant="roll" onClick={() => handleRoll(rollDie())}>
               🎲 &nbsp;ROLL &amp; DRAW
             </Button>
           </div>
@@ -1484,8 +1554,8 @@ git commit -m "feat: /play page with full solo/team game loop, paywall at card 1
 - Create: `middleware.ts`
 - Create: `app/(auth)/login/page.tsx`
 - Create: `app/(auth)/signup/page.tsx`
-- Create: `app/(auth)/callback/page.tsx`
-- Create: `.env.local`
+- Create: `app/auth/callback/page.tsx` (outside route group — URL must be `/auth/callback`)
+- Create: `.env.local` (never commit — in .gitignore)
 
 - [ ] **Step 1: Create Supabase project**
 
@@ -1528,9 +1598,14 @@ export async function createClient() {
       cookies: {
         getAll() { return cookieStore.getAll() },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            cookieStore.set(name, value, options)
-          )
+          // setAll throws in Server Components (read-only cookies) — safe to ignore
+          try {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            )
+          } catch {
+            // Intentional: read-only in Server Components; middleware handles refresh
+          }
         },
       },
     }
@@ -1630,9 +1705,63 @@ export default function LoginPage() {
 
 - [ ] **Step 7: Create `app/(auth)/signup/page.tsx`**
 
-Same structure as login — Supabase magic link flow handles both signups and logins. Just change heading text to "Create your account" and swap login link to sign-in.
+```tsx
+'use client'
+import { useState } from 'react'
+import { createClient } from '@/lib/supabase/client'
+import { Button } from '@/components/ui/Button'
 
-- [ ] **Step 8: Create `app/(auth)/callback/page.tsx`**
+export default function SignupPage() {
+  const [email, setEmail] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [sent, setSent] = useState(false)
+  const supabase = createClient()
+
+  async function handleMagicLink() {
+    setLoading(true)
+    await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: `${location.origin}/auth/callback` } })
+    setSent(true)
+    setLoading(false)
+  }
+
+  async function handleGoogle() {
+    await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: `${location.origin}/auth/callback` } })
+  }
+
+  return (
+    <div className="min-h-dvh bg-bg flex flex-col items-center justify-center p-6 gap-6">
+      <div className="font-display font-black text-2xl bg-gradient-to-r from-teal to-pink bg-clip-text text-transparent">GiGLz</div>
+      {sent ? (
+        <div className="text-center">
+          <div className="text-2xl mb-3">✉️</div>
+          <div className="font-display font-black text-lg mb-2">Check your email</div>
+          <div className="text-sm text-[var(--text-secondary)]">We sent a magic link to {email}</div>
+        </div>
+      ) : (
+        <div className="w-full max-w-sm space-y-4">
+          <div className="text-center">
+            <h1 className="font-display font-black text-xl mb-1">Create your account</h1>
+            <p className="text-sm text-[var(--text-secondary)]">Free to start. No card required.</p>
+          </div>
+          <div>
+            <label className="text-xs text-[var(--text-muted)] uppercase tracking-widest block mb-2">Email</label>
+            <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com"
+              className="w-full bg-surface2 border border-[var(--border)] rounded-xl px-4 h-12 text-sm text-white placeholder-[var(--text-muted)] outline-none focus:border-teal focus:shadow-[0_0_0_3px_var(--teal-glow)] transition-all" />
+          </div>
+          <Button variant="primary" onClick={handleMagicLink} disabled={loading || !email} className="w-full rounded-2xl">
+            {loading ? 'Sending…' : 'Send Magic Link'}
+          </Button>
+          <div className="flex items-center gap-3 text-xs text-[var(--text-muted)]"><div className="flex-1 h-px bg-[var(--border)]" />or<div className="flex-1 h-px bg-[var(--border)]" /></div>
+          <Button variant="secondary" onClick={handleGoogle} className="w-full rounded-2xl">Continue with Google</Button>
+          <p className="text-center text-xs text-[var(--text-muted)]">Already have an account? <a href="/login" className="text-teal hover:underline">Sign in</a></p>
+        </div>
+      )}
+    </div>
+  )
+}
+```
+
+- [ ] **Step 8: Create `app/auth/callback/page.tsx`** (outside route group so URL is `/auth/callback`)
 
 ```tsx
 'use client'
@@ -1659,7 +1788,8 @@ Supabase → Authentication → Providers → Google → enable, add Google OAut
 - [ ] **Step 10: Commit**
 
 ```bash
-git add lib/supabase/ middleware.ts app/\(auth\)/ .env.local
+# Note: never commit .env.local — it should already be in .gitignore from Next.js scaffold
+git add lib/supabase/ middleware.ts app/\(auth\)/ app/auth/
 git commit -m "feat: Supabase auth (magic link + Google OAuth) with middleware protection"
 ```
 
@@ -1877,13 +2007,44 @@ git commit -m "feat: landing page with hero, how it works, challenge types, pric
 }
 ```
 
-- [ ] **Step 2: Add placeholder PWA icons**
+- [ ] **Step 2: Generate placeholder PWA icons**
 
 ```bash
 mkdir -p public/icons
-# Create 192x192 and 512x512 placeholder PNGs using any image tool
-# or use a PWA icon generator at https://favicon.io/
+
+# Generate solid-colour placeholder icons using Node (no extra deps)
+node -e "
+const { createCanvas } = require('canvas')
+const fs = require('fs')
+
+function makeIcon(size, path) {
+  const canvas = createCanvas(size, size)
+  const ctx = canvas.getContext('2d')
+  ctx.fillStyle = '#68519E'
+  ctx.fillRect(0, 0, size, size)
+  ctx.fillStyle = '#7ADDDA'
+  ctx.font = \`bold \${size * 0.35}px sans-serif\`
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  ctx.fillText('G', size / 2, size / 2)
+  fs.writeFileSync(path, canvas.toBuffer('image/png'))
+}
+
+makeIcon(192, 'public/icons/icon-192.png')
+makeIcon(512, 'public/icons/icon-512.png')
+console.log('Icons generated.')
+"
 ```
+
+If `canvas` is not available, install it: `npm install canvas --save-dev`
+
+Alternatively, if canvas installation fails (native module), use any online PWA icon generator (e.g. https://favicon.io/) to create `icon-192.png` and `icon-512.png` in `public/icons/`. The icons are placeholder — replace with real brand icons before launch.
+
+Verify:
+```bash
+ls -la public/icons/
+```
+Expected: `icon-192.png` and `icon-512.png` exist with non-zero file sizes.
 
 - [ ] **Step 3: Configure next-pwa in `next.config.ts`**
 
@@ -1968,7 +2129,7 @@ git commit -m "feat: Phase 1 complete — core game, auth, landing, PWA deployed
 - [ ] Cards shuffle with no repeats; reshuffle when deck exhausted
 - [ ] 60s timer optional, activates on reveal for all types except Dare
 - [ ] Single-Task Mode: die hidden, fixed challenge type used
-- [ ] PaywallGate appears on roll 16
+- [ ] PaywallGate appears when attempting the 16th roll (after 15 free cards: `cardCount >= FREE_CARD_LIMIT`)
 - [ ] `/login` and `/signup` work (magic link + Google)
 - [ ] `/dashboard` redirects to `/login` when not authenticated
 - [ ] Landing page renders all sections
