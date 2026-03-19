@@ -15,9 +15,9 @@
   --blue:         #3097D1;
   --blue-glow:    rgba(48,151,209,0.3);
   --bg:           #0d0820;
-  --surface-1:    #160f2e;
-  --surface-2:    #1e1640;
-  --surface-3:    #281d54;
+  --surface1:    #160f2e;
+  --surface2:    #1e1640;
+  --surface3:    #281d54;
   --border:       rgba(122,221,218,0.12);
   --border-hover: rgba(122,221,218,0.28);
   --text-primary:   #ffffff;

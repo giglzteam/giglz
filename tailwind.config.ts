@@ -9,16 +9,14 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
-        purple: '#68519E',
-        teal: '#7ADDDA',
-        pink: '#EA6CAE',
-        blue: '#3097D1',
-        bg: '#0d0820',
-        surface1: '#160f2e',
-        surface2: '#1e1640',
-        surface3: '#281d54',
+        purple: 'var(--purple)',
+        teal: 'var(--teal)',
+        pink: 'var(--pink)',
+        blue: 'var(--blue)',
+        bg: 'var(--bg)',
+        surface1: 'var(--surface1)',
+        surface2: 'var(--surface2)',
+        surface3: 'var(--surface3)',
       },
       fontFamily: {
         display: ['Unbounded', 'sans-serif'],
