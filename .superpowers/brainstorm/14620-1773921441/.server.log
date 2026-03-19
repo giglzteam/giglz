@@ -1,0 +1,11 @@
+{"type":"server-started","port":60526,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:60526","screen_dir":"/Users/max/Documents/GitHub/giglz/.superpowers/brainstorm/14620-1773921441"}
+{"type":"screen-added","file":"/Users/max/Documents/GitHub/giglz/.superpowers/brainstorm/14620-1773921441/phase-scope.html"}
+{"source":"user-event","type":"click","text":"C\n    \n      Full Spec — All 4 Phases\n      Design the complete system end-to-end (game + auth + subscriptions + multiplayer rooms + dashboard) before writing any code. Longer upfront, but complete picture.","choice":"full","id":null,"timestamp":1773921489054}
+{"type":"screen-added","file":"/Users/max/Documents/GitHub/giglz/.superpowers/brainstorm/14620-1773921441/waiting.html"}
+{"type":"screen-added","file":"/Users/max/Documents/GitHub/giglz/.superpowers/brainstorm/14620-1773921441/game-screen-layout.html"}
+{"type":"screen-added","file":"/Users/max/Documents/GitHub/giglz/.superpowers/brainstorm/14620-1773921441/game-screen-v2.html"}
+{"type":"screen-added","file":"/Users/max/Documents/GitHub/giglz/.superpowers/brainstorm/14620-1773921441/card-highlight-options.html"}
+{"type":"screen-added","file":"/Users/max/Documents/GitHub/giglz/.superpowers/brainstorm/14620-1773921441/approaches.html"}
+{"type":"screen-added","file":"/Users/max/Documents/GitHub/giglz/.superpowers/brainstorm/14620-1773921441/design-s1-architecture.html"}
+{"type":"screen-added","file":"/Users/max/Documents/GitHub/giglz/.superpowers/brainstorm/14620-1773921441/design-s2-screens.html"}
+{"type":"screen-added","file":"/Users/max/Documents/GitHub/giglz/.superpowers/brainstorm/14620-1773921441/design-s3-brand.html"}

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Giglz — Design: Architecture</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@700;900&family=DM+Sans:wght@400;500;600;700&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --purple:#68519E; --teal:#7ADDDA; --pink:#EA6CAE; --blue:#3097D1; --font-display:'Unbounded',sans-serif; --font-body:'DM Sans',sans-serif; }
+  body { background:#0e0820; color:#fff; font-family:var(--font-body); min-height:100vh; padding:40px 24px 60px; display:flex; flex-direction:column; align-items:center; gap:32px; }
+  .page-title { font-family:var(--font-display); font-size:10px; letter-spacing:0.18em; text-transform:uppercase; color:var(--teal); opacity:0.7; }
+  .section-title { font-family:var(--font-display); font-size:18px; font-weight:900; color:#fff; text-align:center; }
+  .section-sub { font-size:13px; color:rgba(255,255,255,0.5); text-align:center; max-width:580px; line-height:1.7; }
+
+  .card { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:20px; padding:28px; width:100%; max-width:760px; }
+  .card h3 { font-family:var(--font-display); font-size:12px; letter-spacing:0.12em; text-transform:uppercase; margin-bottom:16px; }
+  .card h3.purple { color:var(--purple); } .card h3.teal { color:var(--teal); } .card h3.pink { color:var(--pink); } .card h3.blue { color:var(--blue); }
+
+  /* Stack grid */
+  .stack-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .stack-item { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px 16px; }
+  .stack-item .label { font-size:10px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:rgba(255,255,255,0.35); margin-bottom:4px; }
+  .stack-item .value { font-size:14px; font-weight:600; color:#fff; }
+  .stack-item .note { font-size:11px; color:rgba(255,255,255,0.4); margin-top:2px; }
+
+  /* Data model */
+  .code-block { background:#0a0516; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:18px 20px; font-family:monospace; font-size:12px; line-height:1.8; overflow-x:auto; }
+  .code-block .key { color:var(--teal); }
+  .code-block .val { color:#c3b6f0; }
+  .code-block .str { color:var(--pink); }
+  .code-block .comment { color:rgba(255,255,255,0.3); }
+
+  /* Die mapping */
+  .die-map { display:flex; flex-direction:column; gap:8px; }
+  .die-row { display:flex; align-items:center; gap:14px; }
+  .die-num { width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-size:16px; font-weight:900; flex-shrink:0; }
+  .d1{background:var(--pink);color:#fff;} .d2{background:var(--teal);color:#000;} .d3{background:var(--purple);} .d4{background:var(--blue);} .d5{background:var(--teal);color:#000;} .d6{background:var(--pink);}
+  .die-info .type-name { font-family:var(--font-display); font-size:12px; font-weight:700; color:#fff; }
+  .die-info .type-desc { font-size:11px; color:rgba(255,255,255,0.45); margin-top:1px; }
+
+  /* Phases */
+  .phases { display:flex; flex-direction:column; gap:12px; }
+  .phase-row { display:flex; gap:14px; align-items:flex-start; }
+  .phase-num { font-family:var(--font-display); font-size:11px; font-weight:900; padding:6px 12px; border-radius:20px; flex-shrink:0; margin-top:2px; }
+  .ph1{background:rgba(104,81,158,0.3);color:#b39ddb;border:1px solid rgba(104,81,158,0.4);}
+  .ph2{background:rgba(122,221,218,0.15);color:var(--teal);border:1px solid rgba(122,221,218,0.3);}
+  .ph3{background:rgba(234,108,174,0.15);color:var(--pink);border:1px solid rgba(234,108,174,0.3);}
+  .ph4{background:rgba(48,151,209,0.15);color:var(--blue);border:1px solid rgba(48,151,209,0.3);}
+  .phase-content .phase-title { font-family:var(--font-display); font-size:12px; font-weight:900; color:#fff; margin-bottom:4px; }
+  .phase-content .phase-desc { font-size:12px; color:rgba(255,255,255,0.5); line-height:1.6; }
+
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; width:100%; max-width:760px; }
+</style>
+</head>
+<body>
+
+<div class="page-title">Design — Section 1 of 3</div>
+<div class="section-title">Architecture & Data Model</div>
+<div class="section-sub">The technical foundation. Review each block and let me know if anything needs adjusting.</div>
+
+<!-- TECH STACK -->
+<div class="card">
+  <h3 class="teal">Tech Stack</h3>
+  <div class="stack-grid">
+    <div class="stack-item"><div class="label">Framework</div><div class="value">Next.js 14 (App Router)</div><div class="note">TypeScript throughout</div></div>
+    <div class="stack-item"><div class="label">Styling</div><div class="value">Tailwind CSS</div><div class="note">+ CSS variables for brand tokens</div></div>
+    <div class="stack-item"><div class="label">Database & Auth</div><div class="value">Supabase</div><div class="note">Postgres + Auth + Realtime (Phase 3)</div></div>
+    <div class="stack-item"><div class="label">Payments</div><div class="value">Stripe</div><div class="note">Subscriptions (Phase 2)</div></div>
+    <div class="stack-item"><div class="label">Hosting</div><div class="value">Vercel</div><div class="note">Free tier to start, auto-scales</div></div>
+    <div class="stack-item"><div class="label">PWA</div><div class="value">next-pwa</div><div class="note">"Add to home screen" on iOS/Android</div></div>
+    <div class="stack-item"><div class="label">Email</div><div class="value">Resend</div><div class="note">Transactional emails (Phase 2)</div></div>
+    <div class="stack-item"><div class="label">Fonts</div><div class="value">Unbounded + DM Sans</div><div class="note">Display + body, via Google Fonts</div></div>
+  </div>
+</div>
+
+<!-- CARD DATA MODEL -->
+<div class="card">
+  <h3 class="pink">Card Data Model (Simplified)</h3>
+  <p style="font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:14px;line-height:1.6;">
+    Because die→type mapping is consistent across all cards, we don't need card text in the database. The app stores only the card image filenames. The PNG <em>is</em> the card.
+  </p>
+  <div class="code-block">
+<span class="comment">// lib/game/cards.ts</span>
+
+<span class="comment">// All 75 card image paths (public/cards/26.png → 100.png)</span>
+<span class="key">export const</span> <span class="val">CARD_IDS</span> = [<span class="str">26</span>, <span class="str">27</span>, ..., <span class="str">100</span>]  <span class="comment">// 75 cards</span>
+
+<span class="comment">// Fixed die → challenge type mapping (same on every card)</span>
+<span class="key">export const</span> <span class="val">DIE_MAP</span> = {
+  <span class="str">1</span>: { <span class="key">type</span>: <span class="str">'words'</span>,        <span class="key">label</span>: <span class="str">'Words'</span>,        <span class="key">desc</span>: <span class="str">'Explain without saying the word'</span>,    <span class="key">color</span>: <span class="str">'#EA6CAE'</span> },
+  <span class="str">2</span>: { <span class="key">type</span>: <span class="str">'cliche'</span>,       <span class="key">label</span>: <span class="str">'Cliché'</span>,       <span class="key">desc</span>: <span class="str">'Complete the well-known phrase'</span>,      <span class="key">color</span>: <span class="str">'#7ADDDA'</span> },
+  <span class="str">3</span>: { <span class="key">type</span>: <span class="str">'associations'</span>, <span class="key">label</span>: <span class="str">'Associations'</span>, <span class="key">desc</span>: <span class="str">'Say words that relate to the topic'</span>,  <span class="key">color</span>: <span class="str">'#68519E'</span> },
+  <span class="str">4</span>: { <span class="key">type</span>: <span class="str">'gestures'</span>,     <span class="key">label</span>: <span class="str">'Gestures'</span>,     <span class="key">desc</span>: <span class="str">'Act it out — no talking!'</span>,           <span class="key">color</span>: <span class="str">'#3097D1'</span> },
+  <span class="str">5</span>: { <span class="key">type</span>: <span class="str">'persona'</span>,      <span class="key">label</span>: <span class="str">'Persona'</span>,      <span class="key">desc</span>: <span class="str">'Act as the character or celebrity'</span>,  <span class="key">color</span>: <span class="str">'#7ADDDA'</span> },
+  <span class="str">6</span>: { <span class="key">type</span>: <span class="str">'dares'</span>,        <span class="key">label</span>: <span class="str">'Dares'</span>,        <span class="key">desc</span>: <span class="str">'Complete the dare!'</span>,                 <span class="key">color</span>: <span class="str">'#EA6CAE'</span> },
+}
+
+<span class="comment">// Game state (pure client-side, no DB in Phase 1)</span>
+<span class="key">interface</span> <span class="val">GameState</span> {
+  <span class="key">players</span>:      { name: string; emoji: string; score: number }[]
+  <span class="key">currentPlayer</span>: number
+  <span class="key">deck</span>:          number[]   <span class="comment">// shuffled card IDs</span>
+  <span class="key">deckIndex</span>:     number     <span class="comment">// current position in deck</span>
+  <span class="key">dieValue</span>:      number | null
+  <span class="key">phase</span>:         <span class="str">'setup'</span> | <span class="str">'rolling'</span> | <span class="str">'reveal'</span> | <span class="str">'finished'</span>
+  <span class="key">cardsToWin</span>:    number     <span class="comment">// default 10</span>
+}
+  </div>
+</div>
+
+<!-- DIE MAPPING -->
+<div class="card">
+  <h3 class="purple">Die → Challenge Type</h3>
+  <div class="die-map">
+    <div class="die-row"><div class="die-num d1">1</div><div class="die-info"><div class="type-name">Words</div><div class="type-desc">Explain without saying the word. Team guesses.</div></div></div>
+    <div class="die-row"><div class="die-num d2">2</div><div class="die-info"><div class="type-name">Cliché</div><div class="type-desc">Complete the well-known phrase.</div></div></div>
+    <div class="die-row"><div class="die-num d3">3</div><div class="die-info"><div class="type-name">Associations</div><div class="type-desc">Say words that relate to the topic.</div></div></div>
+    <div class="die-row"><div class="die-num d4">4</div><div class="die-info"><div class="type-name">Gestures</div><div class="type-desc">Act it out — no talking allowed!</div></div></div>
+    <div class="die-row"><div class="die-num d5">5</div><div class="die-info"><div class="type-name">Persona</div><div class="type-desc">Act as the character or celebrity.</div></div></div>
+    <div class="die-row"><div class="die-num d6">6</div><div class="die-info"><div class="type-name">Dares</div><div class="type-desc">Complete the dare!</div></div></div>
+  </div>
+</div>
+
+<!-- PHASE PLAN -->
+<div class="card">
+  <h3 class="blue">4-Phase Build Plan (Approach B)</h3>
+  <div class="phases">
+    <div class="phase-row">
+      <div class="phase-num ph1">Phase 1</div>
+      <div class="phase-content">
+        <div class="phase-title">Core Game + Auth + Landing</div>
+        <div class="phase-desc">Next.js scaffold · brand tokens · PNG card display · game engine · player setup · die roll · /play page · Supabase auth (email + Google) · basic paywall gates (UI) · landing page · PWA · deploy to Vercel</div>
+      </div>
+    </div>
+    <div class="phase-row">
+      <div class="phase-num ph2">Phase 2</div>
+      <div class="phase-content">
+        <div class="phase-title">Subscriptions + Real Paywall</div>
+        <div class="phase-desc">Stripe products (Plus €2.99 · Pro €5.99) · checkout route · webhook handler · pricing page · paywall gates enforced server-side · dashboard (plan info + billing)</div>
+      </div>
+    </div>
+    <div class="phase-row">
+      <div class="phase-num ph3">Phase 3</div>
+      <div class="phase-content">
+        <div class="phase-title">Multiplayer Rooms (Pro)</div>
+        <div class="phase-desc">Supabase Realtime · room creation · 6-char join code + QR · guest join (no auth needed) · host controls game · all guests see same card · reconnect handler</div>
+      </div>
+    </div>
+    <div class="phase-row">
+      <div class="phase-num ph4">Phase 4</div>
+      <div class="phase-content">
+        <div class="phase-title">Polish + Growth</div>
+        <div class="phase-desc">Custom card editor · game history · seasonal packs · share results screen · SEO · analytics · email drip to upsell</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

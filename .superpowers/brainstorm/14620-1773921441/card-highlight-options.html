@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Giglz — Card Highlight Options</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@700;900&family=DM+Sans:wght@400;500;600;700&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --purple: #68519E; --teal: #7ADDDA; --pink: #EA6CAE; --blue: #3097D1;
+    --font-display: 'Unbounded', sans-serif; --font-body: 'DM Sans', sans-serif;
+  }
+  body {
+    background: #0e0820; color: #fff; font-family: var(--font-body);
+    min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; padding: 32px 16px 48px; gap: 32px;
+  }
+  .page-title { font-family: var(--font-display); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--teal); opacity: 0.7; text-align: center; }
+  .page-sub { font-size: 13px; color: rgba(255,255,255,0.5); text-align: center; max-width: 520px; line-height: 1.6; }
+  .screens-row { display: flex; gap: 40px; align-items: flex-start; flex-wrap: wrap; justify-content: center; }
+  .variant-label { font-family: var(--font-display); font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(122,221,218,0.5); text-align: center; margin-bottom: 10px; }
+  .variant-desc { font-size: 11px; color: rgba(255,255,255,0.4); text-align: center; margin-top: 8px; max-width: 300px; line-height: 1.5; }
+
+  .phone {
+    width: 340px; background: #1a1030; border-radius: 36px;
+    border: 2px solid rgba(104,81,158,0.5); overflow: hidden;
+    display: flex; flex-direction: column; min-height: 680px;
+    box-shadow: 0 0 80px rgba(104,81,158,0.3), 0 0 0 5px #110820;
+  }
+  .top-bar { display: flex; align-items: center; justify-content: space-between; padding: 16px 16px 8px; }
+  .logo { font-family: var(--font-display); font-size: 18px; font-weight: 900; background: linear-gradient(135deg, var(--teal), var(--pink)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .unlock-btn { font-size: 10px; font-weight: 700; color: #000; background: var(--teal); border: none; border-radius: 20px; padding: 6px 12px; }
+  .current-player { text-align: center; padding: 4px 16px 8px; }
+  .cp-label { font-size: 9px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(122,221,218,0.5); margin-bottom: 1px; }
+  .cp-name { font-family: var(--font-display); font-size: 18px; font-weight: 900; background: linear-gradient(135deg, var(--teal), #fff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .mode-strip { margin: 0 14px 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(122,221,218,0.2); border-radius: 14px; padding: 10px 14px; display: flex; align-items: center; gap: 12px; }
+  .die-pill { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 22px; font-weight: 900; color: #fff; flex-shrink: 0; background: var(--pink); box-shadow: 0 0 20px rgba(234,108,174,0.5); }
+  .mode-name { font-family: var(--font-display); font-size: 12px; font-weight: 900; letter-spacing: 0.06em; text-transform: uppercase; color: var(--pink); margin-bottom: 3px; }
+  .mode-desc { font-size: 11px; color: rgba(255,255,255,0.5); line-height: 1.4; }
+
+  /* ── CARD WRAPPER (PNG placeholder) ── */
+  .card-area { flex: 1; padding: 0 14px; display: flex; align-items: center; justify-content: center; }
+
+  /* Simulated card PNG — purple card with all rows */
+  .card-png-sim {
+    width: 100%; aspect-ratio: 5/7;
+    background: var(--purple);
+    border-radius: 18px;
+    position: relative;
+    overflow: hidden;
+    display: flex; flex-direction: column; padding: 12px; gap: 7px;
+    box-shadow: 0 8px 40px rgba(104,81,158,0.5);
+  }
+  .card-png-sim::after {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 40%;
+    background-image: radial-gradient(circle, rgba(234,108,174,0.5) 1.5px, transparent 1.5px);
+    background-size: 11px 11px; pointer-events: none;
+  }
+  .card-logo-sim { font-family: var(--font-display); font-size: 14px; font-weight: 900; background: linear-gradient(135deg, var(--teal), #fff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 1px; }
+  .crow { background: rgba(255,255,255,0.9); border-radius: 9px; padding: 6px 9px; display: flex; align-items: center; gap: 7px; position: relative; z-index: 1; }
+  .crow .cn { font-family: var(--font-display); font-size: 18px; font-weight: 900; color: #000; min-width: 18px; }
+  .crow .cb { font-size: 9px; font-weight: 700; border-radius: 20px; padding: 2px 8px; color: #fff; display: inline-block; margin-bottom: 1px; }
+  .cb-w { background: var(--pink); } .cb-c { background: var(--teal); color:#000; }
+  .cb-a { background: var(--purple); } .cb-g { background: var(--blue); } .cb-p { background: var(--teal); color:#000; }
+  .crow .cc { font-family: var(--font-display); font-size: 11px; font-weight: 900; color: #111; }
+  .crow5 { width: 55%; }
+  .crow6-side { position: absolute; right: 12px; top: 50%; transform: translateY(-50%) rotate(90deg); z-index: 2; display: flex; align-items: center; gap: 6px; }
+  .c6b { background: var(--blue); border-radius: 7px; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 14px; font-weight: 900; color: #fff; }
+  .c6t { font-family: var(--font-display); font-size: 9px; font-weight: 900; color: #fff; white-space: nowrap; }
+  .star { position: absolute; color: #fff; opacity: 0.7; z-index: 1; }
+
+  /* OPTION A: Arrow overlay pointing to active row */
+  .arrow-overlay {
+    position: absolute; left: -2px; z-index: 10;
+    display: flex; align-items: center; gap: 0;
+  }
+  .arrow-body {
+    background: var(--teal); color: #000; font-family: var(--font-display);
+    font-size: 9px; font-weight: 900; padding: 4px 8px; border-radius: 4px 0 0 4px;
+    white-space: nowrap; box-shadow: 0 0 12px rgba(122,221,218,0.6);
+  }
+  .arrow-tip {
+    width: 0; height: 0;
+    border-top: 12px solid transparent; border-bottom: 12px solid transparent;
+    border-left: 10px solid var(--teal);
+  }
+
+  /* OPTION B: Top glow highlight on active row */
+  .glow-row {
+    box-shadow: 0 0 0 2px var(--teal), 0 0 16px rgba(122,221,218,0.5) !important;
+    background: #fff !important;
+    transform: scale(1.03);
+  }
+
+  /* OPTION C: Large overlay banner at top of card showing active challenge */
+  .active-banner {
+    position: absolute; top: 0; left: 0; right: 0; z-index: 10;
+    background: linear-gradient(135deg, var(--pink), var(--purple));
+    padding: 8px 12px;
+    display: flex; align-items: center; gap: 8px;
+    border-radius: 18px 18px 0 0;
+  }
+  .ab-num { font-family: var(--font-display); font-size: 28px; font-weight: 900; color: #fff; line-height: 1; }
+  .ab-right {}
+  .ab-type { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.7); text-transform: uppercase; letter-spacing: 0.1em; }
+  .ab-word { font-family: var(--font-display); font-size: 16px; font-weight: 900; color: #fff; }
+
+  .timer-wrap { margin: 8px 14px 0; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; }
+  .timer-fill { height: 100%; border-radius: 2px; }
+  .score-bar { padding: 7px 14px 4px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid rgba(255,255,255,0.07); }
+  .pc { display: flex; flex-direction: column; align-items: center; gap: 1px; }
+  .pe { font-size: 16px; } .pn { font-size: 8px; color: rgba(255,255,255,0.35); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
+  .ps { font-family: var(--font-display); font-size: 13px; font-weight: 900; color: #fff; }
+  .pc.active .pn { color: var(--teal); } .pc.active .ps { color: var(--teal); }
+  .actions { padding: 8px 14px 18px; display: flex; gap: 10px; }
+  .btn-skip { flex: 1; padding: 14px; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); border-radius: 13px; color: rgba(255,255,255,0.6); font-family: var(--font-body); font-size: 14px; font-weight: 600; }
+  .btn-correct { flex: 2; padding: 14px; background: var(--teal); border: none; border-radius: 13px; color: #000; font-family: var(--font-display); font-size: 12px; font-weight: 900; letter-spacing: 0.06em; box-shadow: 0 0 20px rgba(122,221,218,0.4); }
+</style>
+</head>
+<body>
+
+<div class="page-title">How do we show the active challenge on your PNG card?</div>
+<div class="page-sub">Since the cards are real PNG images, we need a way to highlight which numbered challenge was rolled. Three options below — pick the one that feels best.</div>
+
+<div class="screens-row">
+
+  <!-- OPTION A: Arrow pointing to active row -->
+  <div>
+    <div class="variant-label">Option A — Arrow pointer</div>
+    <div class="phone">
+      <div class="top-bar"><div class="logo">GiGLz</div><button class="unlock-btn">🔓 Unlock All</button></div>
+      <div class="current-player"><div class="cp-label">Current Player</div><div class="cp-name">😎 Sarah</div></div>
+      <div class="mode-strip">
+        <div class="die-pill">1</div>
+        <div><div class="mode-name">Words</div><div class="mode-desc">Explain without saying it. Team guesses!</div></div>
+      </div>
+      <div class="card-area">
+        <div class="card-png-sim">
+          <div class="card-logo-sim">GiGLz</div>
+          <span class="star" style="top:16px;right:60px;font-size:13px;">★</span>
+          <span class="star" style="top:55px;right:40px;font-size:9px;">★</span>
+          <span class="star" style="bottom:90px;right:55px;font-size:12px;">★</span>
+
+          <!-- Row 1 with arrow pointing to it -->
+          <div class="crow" style="position:relative;">
+            <div class="arrow-overlay" style="top:50%;transform:translateY(-50%);">
+              <div class="arrow-body">▶</div>
+              <div class="arrow-tip"></div>
+            </div>
+            <span class="cn" style="margin-left:32px;">1</span>
+            <div><div class="cb cb-w">words</div><div class="cc">GAS STATION</div></div>
+          </div>
+          <div class="crow"><span class="cn">2</span><div><div class="cb cb-c">cliché</div><div class="cc">MADRID</div></div></div>
+          <div class="crow"><span class="cn">3</span><div><div class="cb cb-a">associations</div><div class="cc">MOTORWAY</div></div></div>
+          <div class="crow"><span class="cn">4</span><div><div class="cb cb-g">gestures</div><div class="cc">TOUCH GRASS</div></div></div>
+          <div class="crow crow5"><span class="cn">5</span><div><div class="cb cb-p">persona</div><div class="cc">L.L.</div></div></div>
+          <div class="crow6-side"><div class="c6b">6</div><div class="c6t">READ YOUR LAST DM OUT LOUD</div></div>
+        </div>
+      </div>
+      <div class="timer-wrap"><div class="timer-fill" style="width:65%;background:var(--teal);"></div></div>
+      <div class="score-bar">
+        <div class="pc active"><div class="pe">😎</div><div class="pn">Sarah</div><div class="ps">3</div></div>
+        <div class="pc"><div class="pe">🎮</div><div class="pn">Tom</div><div class="ps">2</div></div>
+        <div class="pc"><div class="pe">🔥</div><div class="pn">Jade</div><div class="ps">1</div></div>
+        <div class="pc"><div class="pe">⚡</div><div class="pn">Mike</div><div class="ps">0</div></div>
+      </div>
+      <div class="actions"><button class="btn-skip">Skip →</button><button class="btn-correct">Correct ✓</button></div>
+    </div>
+    <div class="variant-desc">A teal arrow points to the active row on the card. Clean, non-destructive to the image.</div>
+  </div>
+
+  <!-- OPTION B: Glow highlight on active row -->
+  <div>
+    <div class="variant-label">Option B — Glow on the die number above card</div>
+    <div class="phone">
+      <div class="top-bar"><div class="logo">GiGLz</div><button class="unlock-btn">🔓 Unlock All</button></div>
+      <div class="current-player"><div class="cp-label">Current Player</div><div class="cp-name">😎 Sarah</div></div>
+      <!-- Enlarged mode strip acts as the main indicator -->
+      <div class="mode-strip" style="background:linear-gradient(135deg,rgba(234,108,174,0.15),rgba(104,81,158,0.15));border-color:rgba(234,108,174,0.4);">
+        <div class="die-pill" style="width:56px;height:56px;font-size:28px;background:var(--pink);box-shadow:0 0 28px rgba(234,108,174,0.7);">1</div>
+        <div>
+          <div class="mode-name" style="font-size:15px;color:var(--pink);">Words</div>
+          <div class="mode-desc" style="color:rgba(255,255,255,0.65);">Explain without saying it. Team guesses!</div>
+        </div>
+      </div>
+      <!-- Full card shown cleanly — no overlay, the mode strip IS the indicator -->
+      <div class="card-area">
+        <div class="card-png-sim">
+          <div class="card-logo-sim">GiGLz</div>
+          <span class="star" style="top:16px;right:60px;font-size:13px;">★</span>
+          <span class="star" style="top:55px;right:40px;font-size:9px;">★</span>
+          <span class="star" style="bottom:90px;right:55px;font-size:12px;">★</span>
+          <div class="crow"><span class="cn">1</span><div><div class="cb cb-w">words</div><div class="cc">GAS STATION</div></div></div>
+          <div class="crow"><span class="cn">2</span><div><div class="cb cb-c">cliché</div><div class="cc">MADRID</div></div></div>
+          <div class="crow"><span class="cn">3</span><div><div class="cb cb-a">associations</div><div class="cc">MOTORWAY</div></div></div>
+          <div class="crow"><span class="cn">4</span><div><div class="cb cb-g">gestures</div><div class="cc">TOUCH GRASS</div></div></div>
+          <div class="crow crow5"><span class="cn">5</span><div><div class="cb cb-p">persona</div><div class="cc">L.L.</div></div></div>
+          <div class="crow6-side"><div class="c6b">6</div><div class="c6t">READ YOUR LAST DM OUT LOUD</div></div>
+        </div>
+      </div>
+      <div class="timer-wrap"><div class="timer-fill" style="width:65%;background:var(--pink);"></div></div>
+      <div class="score-bar">
+        <div class="pc active"><div class="pe">😎</div><div class="pn">Sarah</div><div class="ps">3</div></div>
+        <div class="pc"><div class="pe">🎮</div><div class="pn">Tom</div><div class="ps">2</div></div>
+        <div class="pc"><div class="pe">🔥</div><div class="pn">Jade</div><div class="ps">1</div></div>
+        <div class="pc"><div class="pe">⚡</div><div class="pn">Mike</div><div class="ps">0</div></div>
+      </div>
+      <div class="actions"><button class="btn-skip">Skip →</button><button class="btn-correct">Correct ✓</button></div>
+    </div>
+    <div class="variant-desc">The mode strip above the card is the main indicator — large die number + challenge name. Card shown clean. Simple and clear.</div>
+  </div>
+
+  <!-- OPTION C: Banner at top of card -->
+  <div>
+    <div class="variant-label">Option C — Active challenge banner on card</div>
+    <div class="phone">
+      <div class="top-bar"><div class="logo">GiGLz</div><button class="unlock-btn">🔓 Unlock All</button></div>
+      <div class="current-player"><div class="cp-label">Current Player</div><div class="cp-name">😎 Sarah</div></div>
+      <div class="mode-strip" style="opacity:0.5;">
+        <div class="die-pill">1</div>
+        <div><div class="mode-name">Words</div><div class="mode-desc">Explain without saying it. Team guesses!</div></div>
+      </div>
+      <div class="card-area">
+        <div class="card-png-sim">
+          <!-- Active challenge banner overlaid at top of card -->
+          <div class="active-banner">
+            <div class="ab-num">1</div>
+            <div class="ab-right">
+              <div class="ab-type">Words — Explain without saying it</div>
+              <div class="ab-word">GAS STATION</div>
+            </div>
+          </div>
+          <div style="height:64px;"></div><!-- space for banner -->
+          <div class="card-logo-sim">GiGLz</div>
+          <span class="star" style="top:86px;right:60px;font-size:13px;">★</span>
+          <div class="crow"><span class="cn">1</span><div><div class="cb cb-w">words</div><div class="cc">GAS STATION</div></div></div>
+          <div class="crow"><span class="cn">2</span><div><div class="cb cb-c">cliché</div><div class="cc">MADRID</div></div></div>
+          <div class="crow"><span class="cn">3</span><div><div class="cb cb-a">associations</div><div class="cc">MOTORWAY</div></div></div>
+          <div class="crow"><span class="cn">4</span><div><div class="cb cb-g">gestures</div><div class="cc">TOUCH GRASS</div></div></div>
+          <div class="crow crow5"><span class="cn">5</span><div><div class="cb cb-p">persona</div><div class="cc">L.L.</div></div></div>
+          <div class="crow6-side"><div class="c6b">6</div><div class="c6t">READ YOUR LAST DM OUT LOUD</div></div>
+        </div>
+      </div>
+      <div class="timer-wrap"><div class="timer-fill" style="width:65%;background:var(--purple);"></div></div>
+      <div class="score-bar">
+        <div class="pc active"><div class="pe">😎</div><div class="pn">Sarah</div><div class="ps">3</div></div>
+        <div class="pc"><div class="pe">🎮</div><div class="pn">Tom</div><div class="ps">2</div></div>
+        <div class="pc"><div class="pe">🔥</div><div class="pn">Jade</div><div class="ps">1</div></div>
+        <div class="pc"><div class="pe">⚡</div><div class="pn">Mike</div><div class="ps">0</div></div>
+      </div>
+      <div class="actions"><button class="btn-skip">Skip →</button><button class="btn-correct">Correct ✓</button></div>
+    </div>
+    <div class="variant-desc">A coloured banner overlaid on the top of the card shows the active challenge prominently. The full card is still visible below it.</div>
+  </div>
+
+</div>
+
+</body>
+</html>

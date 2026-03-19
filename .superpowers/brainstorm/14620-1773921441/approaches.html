@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Giglz — Implementation Approaches</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@700;900&family=DM+Sans:wght@400;500;600;700&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --purple: #68519E; --teal: #7ADDDA; --pink: #EA6CAE; --blue: #3097D1;
+    --font-display: 'Unbounded', sans-serif; --font-body: 'DM Sans', sans-serif;
+  }
+  body {
+    background: #0e0820; color: #fff; font-family: var(--font-body);
+    min-height: 100vh; padding: 40px 24px 60px;
+    display: flex; flex-direction: column; align-items: center; gap: 36px;
+  }
+  .page-title { font-family: var(--font-display); font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--teal); opacity: 0.8; text-align: center; }
+  .page-sub { font-size: 14px; color: rgba(255,255,255,0.5); text-align: center; max-width: 560px; line-height: 1.7; }
+
+  .options { display: flex; flex-direction: column; gap: 20px; width: 100%; max-width: 720px; }
+
+  .option {
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px; padding: 28px; cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    position: relative; overflow: hidden;
+  }
+  .option:hover { border-color: rgba(122,221,218,0.4); background: rgba(122,221,218,0.04); }
+  .option.recommended { border-color: rgba(122,221,218,0.5); background: rgba(122,221,218,0.06); }
+  .option.selected { border-color: var(--teal); background: rgba(122,221,218,0.1); box-shadow: 0 0 0 2px var(--teal); }
+
+  .rec-badge {
+    position: absolute; top: 20px; right: 20px;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    background: var(--teal); color: #000; border-radius: 20px; padding: 4px 12px;
+    font-family: var(--font-body);
+  }
+
+  .opt-header { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
+  .opt-letter {
+    width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center;
+    justify-content: center; font-family: var(--font-display); font-size: 20px; font-weight: 900;
+    flex-shrink: 0;
+  }
+  .opt-letter.a { background: var(--purple); box-shadow: 0 0 20px rgba(104,81,158,0.5); }
+  .opt-letter.b { background: var(--teal); color: #000; box-shadow: 0 0 20px rgba(122,221,218,0.5); }
+  .opt-letter.c { background: var(--pink); box-shadow: 0 0 20px rgba(234,108,174,0.4); }
+
+  .opt-title { font-family: var(--font-display); font-size: 14px; font-weight: 900; color: #fff; margin-bottom: 3px; }
+  .opt-subtitle { font-size: 12px; color: rgba(255,255,255,0.45); }
+
+  .opt-body { font-size: 13px; color: rgba(255,255,255,0.7); line-height: 1.7; margin-bottom: 18px; }
+
+  .tags { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tag {
+    font-size: 11px; font-weight: 600; border-radius: 20px; padding: 4px 12px;
+    font-family: var(--font-body);
+  }
+  .tag.pro { background: rgba(122,221,218,0.15); color: var(--teal); border: 1px solid rgba(122,221,218,0.3); }
+  .tag.con { background: rgba(234,108,174,0.12); color: var(--pink); border: 1px solid rgba(234,108,174,0.25); }
+  .tag.neutral { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.12); }
+
+  .phase-timeline { display: flex; gap: 6px; margin-top: 16px; flex-wrap: wrap; }
+  .phase-chip {
+    font-size: 10px; font-weight: 700; font-family: var(--font-display);
+    padding: 5px 12px; border-radius: 20px; letter-spacing: 0.06em;
+  }
+  .ph1 { background: rgba(104,81,158,0.3); color: #b39ddb; border: 1px solid rgba(104,81,158,0.4); }
+  .ph2 { background: rgba(122,221,218,0.15); color: var(--teal); border: 1px solid rgba(122,221,218,0.3); }
+  .ph3 { background: rgba(234,108,174,0.15); color: var(--pink); border: 1px solid rgba(234,108,174,0.3); }
+  .ph4 { background: rgba(48,151,209,0.15); color: var(--blue); border: 1px solid rgba(48,151,209,0.3); }
+
+  .divider { width: 100%; max-width: 720px; height: 1px; background: rgba(255,255,255,0.07); }
+</style>
+</head>
+<body>
+
+<div class="page-title">Three Implementation Approaches</div>
+<div class="page-sub">How we structure the 4-phase build. Click the one you prefer.</div>
+
+<div class="options">
+
+  <!-- OPTION A -->
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="opt-header">
+      <div class="opt-letter a">A</div>
+      <div>
+        <div class="opt-title">Ship Fast, Add Backend Later</div>
+        <div class="opt-subtitle">Phase 1 is 100% client-side. Backend added in Phase 2.</div>
+      </div>
+    </div>
+    <div class="opt-body">
+      Phase 1 launches with zero backend — just Next.js + PNG cards + React state. The game works fully in the browser. Paywall gates are UI-only (honour system). In Phase 2, Supabase + Stripe are bolted on and gates become real.<br><br>
+      Best if you want players using the game <strong>as fast as possible</strong> and are willing to add auth/payments in a second sprint.
+    </div>
+    <div class="tags">
+      <span class="tag pro">✓ Fastest to launch</span>
+      <span class="tag pro">✓ Zero infra cost in Phase 1</span>
+      <span class="tag pro">✓ No Supabase setup needed yet</span>
+      <span class="tag con">✗ No real paywall enforcement until Phase 2</span>
+      <span class="tag con">✗ Some Phase 2 refactor needed</span>
+    </div>
+    <div class="phase-timeline">
+      <div class="phase-chip ph1">P1: Game + Landing</div>
+      <div class="phase-chip ph2">P2: Supabase + Stripe</div>
+      <div class="phase-chip ph3">P3: Multiplayer</div>
+      <div class="phase-chip ph4">P4: Polish + Growth</div>
+    </div>
+  </div>
+
+  <!-- OPTION B — RECOMMENDED -->
+  <div class="option recommended" data-choice="b" onclick="toggleSelect(this)">
+    <div class="rec-badge">★ Recommended</div>
+    <div class="opt-header">
+      <div class="opt-letter b">B</div>
+      <div>
+        <div class="opt-title">Solid Foundation First</div>
+        <div class="opt-subtitle">Supabase + auth set up in Phase 1. Stripe in Phase 2.</div>
+      </div>
+    </div>
+    <div class="opt-body">
+      Phase 1 scaffolds the game AND sets up Supabase auth so the paywall gates are real from day one. Stripe subscriptions come in Phase 2 but the user system is already in place, making Phase 2 straightforward. No rework needed between phases.<br><br>
+      Best if you want to start collecting emails / users immediately and avoid retrofitting auth later. The extra setup in Phase 1 is a few hours, not days.
+    </div>
+    <div class="tags">
+      <span class="tag pro">✓ Real user accounts from launch</span>
+      <span class="tag pro">✓ No auth rework in Phase 2</span>
+      <span class="tag pro">✓ Can gate features properly from day 1</span>
+      <span class="tag neutral">~ 1–2 extra days of Phase 1 setup</span>
+      <span class="tag con">✗ Supabase project needs configuring upfront</span>
+    </div>
+    <div class="phase-timeline">
+      <div class="phase-chip ph1">P1: Game + Auth + Landing</div>
+      <div class="phase-chip ph2">P2: Stripe + Paywall</div>
+      <div class="phase-chip ph3">P3: Multiplayer</div>
+      <div class="phase-chip ph4">P4: Polish + Growth</div>
+    </div>
+  </div>
+
+  <!-- OPTION C -->
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="opt-header">
+      <div class="opt-letter c">C</div>
+      <div>
+        <div class="opt-title">Full Stack from Day One</div>
+        <div class="opt-subtitle">Supabase + Stripe + auth all in Phase 1.</div>
+      </div>
+    </div>
+    <div class="opt-body">
+      Everything — game engine, auth, Stripe subscriptions, and paywall gates — is wired up before going live. Phase 1 is a complete, monetisable product. Later phases add multiplayer and polish only.<br><br>
+      Best if you want to launch once and have it immediately ready to take payment. Higher Phase 1 complexity, but you're production-ready from the first deploy.
+    </div>
+    <div class="tags">
+      <span class="tag pro">✓ Monetisable from first launch</span>
+      <span class="tag pro">✓ Single big build, then polish</span>
+      <span class="tag con">✗ Longest Phase 1</span>
+      <span class="tag con">✗ More moving parts before you can play-test</span>
+      <span class="tag neutral">~ 3–4 weeks before first deploy</span>
+    </div>
+    <div class="phase-timeline">
+      <div class="phase-chip ph1">P1: Game + Auth + Stripe + Paywall</div>
+      <div class="phase-chip ph2">P2: Multiplayer</div>
+      <div class="phase-chip ph3">P3: Dashboard + Cards</div>
+      <div class="phase-chip ph4">P4: Polish + Growth</div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

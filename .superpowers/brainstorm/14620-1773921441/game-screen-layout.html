@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Giglz — Game Screen Mockup</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --color-bg:           #0A0A0F;
+    --color-surface:      #13131A;
+    --color-surface-2:    #1C1C27;
+    --color-border:       #2A2A3A;
+    --color-accent:       #F5C842;
+    --color-accent-dim:   #C9A235;
+    --color-accent-glow:  rgba(245,200,66,0.15);
+    --color-words:        #4ECDC4;
+    --color-cliche:       #FF6B9D;
+    --color-associations: #A78BFA;
+    --color-gestures:     #F97316;
+    --color-persona:      #22D3EE;
+    --color-dares:        #EF4444;
+    --font-display: 'Unbounded', sans-serif;
+    --font-body:    'DM Sans', sans-serif;
+  }
+
+  body {
+    background: var(--color-bg);
+    color: #fff;
+    font-family: var(--font-body);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 48px;
+    padding: 32px 24px;
+    flex-wrap: wrap;
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-size: 13px;
+    letter-spacing: 0.15em;
+    color: #5A5A78;
+    text-align: center;
+    width: 100%;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .label-row {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #5A5A78;
+    text-align: center;
+    width: 100%;
+    margin-bottom: 4px;
+  }
+
+  /* ── PHONE FRAME ── */
+  .phone {
+    width: 390px;
+    background: var(--color-bg);
+    border-radius: 40px;
+    border: 2px solid var(--color-border);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 700px;
+    position: relative;
+    box-shadow: 0 0 80px rgba(0,0,0,0.6), 0 0 0 6px #111;
+  }
+
+  .phone-label {
+    font-family: var(--font-display);
+    font-size: 10px;
+    color: #5A5A78;
+    text-align: center;
+    padding: 8px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* ── TOP BAR ── */
+  .top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px 12px;
+  }
+
+  .logo {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 900;
+    color: var(--color-accent);
+    letter-spacing: 0.05em;
+  }
+
+  .unlock-btn {
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-bg);
+    background: var(--color-accent);
+    border: none;
+    border-radius: 20px;
+    padding: 6px 14px;
+    cursor: pointer;
+  }
+
+  /* ── CURRENT PLAYER ── */
+  .current-player {
+    text-align: center;
+    padding: 8px 20px 10px;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .current-player .cp-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #5A5A78;
+    margin-bottom: 2px;
+  }
+
+  .current-player .cp-name {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--color-accent);
+  }
+
+  /* ── GAME MODE STRIP (above the card) ── */
+  .game-mode-strip {
+    margin: 14px 20px 10px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 14px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .die-badge {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: var(--color-words);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 900;
+    color: #000;
+    flex-shrink: 0;
+    box-shadow: 0 0 18px rgba(78,205,196,0.5);
+  }
+
+  .mode-info {}
+  .mode-name {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--color-words);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 3px;
+  }
+  .mode-desc {
+    font-size: 12px;
+    color: #A0A0B8;
+    line-height: 1.4;
+  }
+
+  /* ── GAME CARD ── */
+  .card-area {
+    padding: 0 20px;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .game-card {
+    width: 100%;
+    aspect-ratio: 3/2;
+    background: var(--color-surface);
+    border: 2px solid var(--color-words);
+    border-radius: 20px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    box-shadow: 0 0 40px rgba(78,205,196,0.15), inset 0 0 60px rgba(0,0,0,0.3);
+    overflow: hidden;
+  }
+
+  /* noise texture overlay */
+  .game-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 18px;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  .card-type-badge {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    font-family: var(--font-display);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-words);
+    background: rgba(78,205,196,0.12);
+    border: 1px solid rgba(78,205,196,0.3);
+    padding: 4px 10px;
+    border-radius: 20px;
+  }
+
+  .card-die-num {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: rgba(78,205,196,0.15);
+    border: 1px solid rgba(78,205,196,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 900;
+    color: var(--color-words);
+  }
+
+  .card-content {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 900;
+    text-align: center;
+    color: #fff;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+  }
+
+  .card-hint {
+    position: absolute;
+    bottom: 12px;
+    font-size: 11px;
+    color: #5A5A78;
+    letter-spacing: 0.05em;
+  }
+
+  /* ── TIMER BAR ── */
+  .timer-bar-wrap {
+    margin: 10px 20px 0;
+    height: 4px;
+    background: var(--color-surface-2);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .timer-bar-fill {
+    height: 100%;
+    width: 65%;
+    background: var(--color-accent);
+    border-radius: 2px;
+  }
+
+  /* ── ACTION BUTTONS ── */
+  .action-area {
+    padding: 12px 20px 20px;
+    display: flex;
+    gap: 10px;
+  }
+
+  .btn-skip {
+    flex: 1;
+    padding: 16px;
+    background: var(--color-surface-2);
+    border: 1px solid var(--color-border);
+    border-radius: 14px;
+    color: #A0A0B8;
+    font-family: var(--font-body);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .btn-correct {
+    flex: 2;
+    padding: 16px;
+    background: var(--color-accent);
+    border: none;
+    border-radius: 14px;
+    color: #000;
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    box-shadow: 0 0 24px rgba(245,200,66,0.35);
+  }
+
+  /* ── DIE ROLL VARIANT ── */
+  .roll-area {
+    padding: 12px 20px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .btn-roll {
+    width: 100%;
+    padding: 18px;
+    background: var(--color-accent);
+    border: none;
+    border-radius: 16px;
+    color: #000;
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    box-shadow: 0 0 32px rgba(245,200,66,0.4);
+  }
+
+  /* ── SCOREBAR ── */
+  .score-bar {
+    padding: 8px 20px 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--color-border);
+    gap: 8px;
+    overflow-x: auto;
+  }
+
+  .player-chip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+    min-width: 44px;
+  }
+
+  .player-chip .emoji { font-size: 18px; }
+  .player-chip .pname { font-size: 9px; color: #5A5A78; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; }
+  .player-chip .pscore { font-family: var(--font-display); font-size: 13px; font-weight: 900; color: #fff; }
+  .player-chip.active .pname { color: var(--color-accent); }
+  .player-chip.active .pscore { color: var(--color-accent); }
+
+  /* ── VARIANTS SECTION ── */
+  .variants-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    align-items: center;
+  }
+  .variant-label {
+    font-family: var(--font-display);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #5A5A78;
+    text-align: center;
+    margin-bottom: 6px;
+  }
+</style>
+</head>
+<body>
+
+<div style="width:100%;text-align:center;margin-bottom:24px;">
+  <div style="font-family:'Unbounded',sans-serif;font-size:11px;letter-spacing:0.15em;color:#5A5A78;text-transform:uppercase;margin-bottom:6px;">Giglz — Game Screen Mockup</div>
+  <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:#A0A0B8;">Two states: waiting to roll (left) vs. card revealed (right)</div>
+</div>
+
+<div class="variants-wrap">
+
+  <!-- STATE 1: Waiting to roll -->
+  <div>
+    <div class="variant-label">State 1 — Roll Phase</div>
+    <div class="phone">
+      <div class="top-bar">
+        <div class="logo">GIGLZ</div>
+        <button class="unlock-btn">🔓 Unlock All</button>
+      </div>
+      <div class="current-player">
+        <div class="cp-label">Current Player</div>
+        <div class="cp-name">😎 Sarah</div>
+      </div>
+      <!-- game mode strip — above card -->
+      <div class="game-mode-strip">
+        <div class="die-badge">1</div>
+        <div class="mode-info">
+          <div class="mode-name">Words</div>
+          <div class="mode-desc">Explain the word without saying it. Your team guesses.</div>
+        </div>
+      </div>
+      <div class="card-area">
+        <div class="game-card" style="justify-content:center;align-items:center;">
+          <div class="card-type-badge">Words</div>
+          <div class="card-die-num">1</div>
+          <div style="font-family:'Unbounded',sans-serif;font-size:40px;opacity:0.08;color:#fff;">?</div>
+          <div class="card-hint">👆 Roll to reveal</div>
+        </div>
+      </div>
+      <div class="timer-bar-wrap"><div class="timer-bar-fill" style="width:0%;"></div></div>
+      <div class="score-bar">
+        <div class="player-chip active"><span class="emoji">😎</span><span class="pname">Sarah</span><span class="pscore">3</span></div>
+        <div class="player-chip"><span class="emoji">🎮</span><span class="pname">Tom</span><span class="pscore">2</span></div>
+        <div class="player-chip"><span class="emoji">🔥</span><span class="pname">Jade</span><span class="pscore">1</span></div>
+        <div class="player-chip"><span class="emoji">⚡</span><span class="pname">Mike</span><span class="pscore">0</span></div>
+      </div>
+      <div class="roll-area">
+        <button class="btn-roll">🎲 ROLL &amp; DRAW</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATE 2: Card revealed -->
+  <div>
+    <div class="variant-label">State 2 — Card Revealed</div>
+    <div class="phone">
+      <div class="top-bar">
+        <div class="logo">GIGLZ</div>
+        <button class="unlock-btn">🔓 Unlock All</button>
+      </div>
+      <div class="current-player">
+        <div class="cp-label">Current Player</div>
+        <div class="cp-name">😎 Sarah</div>
+      </div>
+      <!-- game mode strip — above card -->
+      <div class="game-mode-strip">
+        <div class="die-badge">1</div>
+        <div class="mode-info">
+          <div class="mode-name">Words</div>
+          <div class="mode-desc">Explain the word without saying it. Your team guesses.</div>
+        </div>
+      </div>
+      <div class="card-area">
+        <div class="game-card">
+          <div class="card-type-badge">Words</div>
+          <div class="card-die-num">1</div>
+          <div class="card-content">Spaghetti</div>
+        </div>
+      </div>
+      <div class="timer-bar-wrap">
+        <div class="timer-bar-fill" style="width:65%;background:var(--color-accent);transition:width 1s linear;"></div>
+      </div>
+      <div class="score-bar">
+        <div class="player-chip active"><span class="emoji">😎</span><span class="pname">Sarah</span><span class="pscore">3</span></div>
+        <div class="player-chip"><span class="emoji">🎮</span><span class="pname">Tom</span><span class="pscore">2</span></div>
+        <div class="player-chip"><span class="emoji">🔥</span><span class="pname">Jade</span><span class="pscore">1</span></div>
+        <div class="player-chip"><span class="emoji">⚡</span><span class="pname">Mike</span><span class="pscore">0</span></div>
+      </div>
+      <div class="action-area">
+        <button class="btn-skip">Skip →</button>
+        <button class="btn-correct">Correct ✓</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

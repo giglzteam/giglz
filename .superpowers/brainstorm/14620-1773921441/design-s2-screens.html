@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Giglz — Design: Screens & Flow</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@700;900&family=DM+Sans:wght@400;500;600;700&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --purple:#68519E; --teal:#7ADDDA; --pink:#EA6CAE; --blue:#3097D1; --font-display:'Unbounded',sans-serif; --font-body:'DM Sans',sans-serif; }
+  body { background:#0e0820; color:#fff; font-family:var(--font-body); min-height:100vh; padding:40px 24px 60px; display:flex; flex-direction:column; align-items:center; gap:32px; }
+
+  .page-title { font-family:var(--font-display); font-size:10px; letter-spacing:0.18em; text-transform:uppercase; color:var(--teal); opacity:0.7; }
+  .section-title { font-family:var(--font-display); font-size:18px; font-weight:900; color:#fff; text-align:center; }
+  .section-sub { font-size:13px; color:rgba(255,255,255,0.5); text-align:center; max-width:600px; line-height:1.7; }
+
+  .card { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:20px; padding:28px; width:100%; max-width:820px; }
+  .card h3 { font-family:var(--font-display); font-size:11px; letter-spacing:0.12em; text-transform:uppercase; margin-bottom:18px; }
+  .card h3.teal{color:var(--teal);} .card h3.pink{color:var(--pink);} .card h3.purple{color:var(--purple);} .card h3.blue{color:var(--blue);}
+
+  /* Flow diagram */
+  .flow { display:flex; flex-direction:column; gap:0; }
+  .flow-step { display:flex; gap:16px; align-items:flex-start; }
+  .flow-left { display:flex; flex-direction:column; align-items:center; flex-shrink:0; width:40px; }
+  .flow-dot { width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-size:14px; font-weight:900; flex-shrink:0; }
+  .flow-line { width:2px; flex:1; min-height:16px; background:rgba(255,255,255,0.1); }
+  .flow-content { padding:0 0 20px; }
+  .flow-title { font-family:var(--font-display); font-size:13px; font-weight:900; color:#fff; margin-bottom:4px; }
+  .flow-desc { font-size:12px; color:rgba(255,255,255,0.5); line-height:1.6; }
+  .flow-tags { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+  .ftag { font-size:10px; font-weight:600; border-radius:20px; padding:3px 10px; background:rgba(255,255,255,0.07); color:rgba(255,255,255,0.45); border:1px solid rgba(255,255,255,0.1); }
+  .ftag.t { background:rgba(122,221,218,0.12); color:var(--teal); border-color:rgba(122,221,218,0.3); }
+  .ftag.p { background:rgba(234,108,174,0.12); color:var(--pink); border-color:rgba(234,108,174,0.3); }
+
+  /* Route table */
+  .route-table { display:flex; flex-direction:column; gap:8px; }
+  .route-row { display:flex; align-items:flex-start; gap:14px; padding:12px 14px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:12px; }
+  .route-path { font-family:monospace; font-size:12px; color:var(--teal); min-width:180px; flex-shrink:0; padding-top:2px; }
+  .route-info .route-name { font-size:13px; font-weight:600; color:#fff; margin-bottom:2px; }
+  .route-info .route-desc { font-size:11px; color:rgba(255,255,255,0.4); line-height:1.5; }
+  .route-badge { font-size:9px; font-weight:700; border-radius:20px; padding:3px 9px; margin-left:auto; flex-shrink:0; align-self:flex-start; }
+  .rb-p1 { background:rgba(104,81,158,0.3); color:#b39ddb; border:1px solid rgba(104,81,158,0.4); }
+  .rb-p2 { background:rgba(122,221,218,0.15); color:var(--teal); border:1px solid rgba(122,221,218,0.3); }
+  .rb-p3 { background:rgba(234,108,174,0.15); color:var(--pink); border:1px solid rgba(234,108,174,0.3); }
+
+  /* Screens grid */
+  .screens-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .screen-card { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:16px; }
+  .screen-title { font-family:var(--font-display); font-size:11px; font-weight:900; color:#fff; margin-bottom:6px; }
+  .screen-desc { font-size:11px; color:rgba(255,255,255,0.45); line-height:1.6; }
+
+  /* Phone mockup mini */
+  .mini-phones { display:flex; gap:20px; justify-content:center; flex-wrap:wrap; }
+  .mini-phone { width:180px; background:#1a1030; border-radius:24px; border:1.5px solid rgba(104,81,158,0.4); overflow:hidden; display:flex; flex-direction:column; box-shadow:0 0 40px rgba(104,81,158,0.2); }
+  .mp-bar { padding:10px 12px 6px; display:flex; justify-content:space-between; align-items:center; }
+  .mp-logo { font-family:var(--font-display); font-size:10px; font-weight:900; background:linear-gradient(135deg,var(--teal),var(--pink)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+  .mp-body { flex:1; padding:0 10px 10px; display:flex; flex-direction:column; gap:6px; }
+  .mp-label { font-size:8px; letter-spacing:0.12em; text-transform:uppercase; color:rgba(255,255,255,0.35); margin-bottom:2px; }
+  .mp-heading { font-family:var(--font-display); font-size:9px; font-weight:900; color:#fff; margin-bottom:4px; }
+
+  /* Player setup mini */
+  .player-row-mini { display:flex; align-items:center; gap:6px; background:rgba(255,255,255,0.06); border-radius:8px; padding:6px 8px; }
+  .player-emoji-mini { font-size:14px; }
+  .player-input-mini { flex:1; height:8px; background:rgba(255,255,255,0.15); border-radius:4px; }
+  .btn-mini { background:var(--teal); border-radius:8px; padding:8px; text-align:center; font-family:var(--font-display); font-size:8px; font-weight:900; color:#000; margin-top:4px; }
+  .btn-mini-purple { background:linear-gradient(135deg,var(--purple),var(--blue)); color:#fff; }
+
+  /* Card mini */
+  .card-mini { background:var(--purple); border-radius:10px; aspect-ratio:5/7; position:relative; overflow:hidden; display:flex; flex-direction:column; padding:8px; gap:4px; }
+  .card-mini::after { content:''; position:absolute; bottom:0; left:0; right:0; height:35%; background-image:radial-gradient(circle, rgba(234,108,174,0.5) 1px, transparent 1px); background-size:8px 8px; }
+  .crow-mini { background:rgba(255,255,255,0.88); border-radius:5px; padding:3px 5px; display:flex; align-items:center; gap:4px; z-index:1; position:relative; }
+  .crow-mini.active { box-shadow:0 0 0 1.5px var(--teal); background:#fff; }
+  .cn-mini { font-family:var(--font-display); font-size:9px; font-weight:900; color:#000; }
+  .cb-mini { font-size:7px; font-weight:700; border-radius:10px; padding:1px 5px; color:#fff; } .cbw{background:var(--pink);} .cbt{background:var(--teal);color:#000;} .cba{background:var(--purple);} .cbg{background:var(--blue);}
+  .cc-mini { font-family:var(--font-display); font-size:7px; font-weight:900; color:#111; }
+
+  /* Mode strip mini */
+  .mode-mini { margin:0 10px 6px; background:rgba(255,255,255,0.05); border:1px solid rgba(122,221,218,0.2); border-radius:8px; padding:6px 8px; display:flex; align-items:center; gap:8px; }
+  .die-mini { width:28px; height:28px; background:var(--pink); border-radius:7px; display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-size:13px; font-weight:900; flex-shrink:0; box-shadow:0 0 12px rgba(234,108,174,0.5); }
+  .mode-mini-text .mn { font-family:var(--font-display); font-size:8px; font-weight:900; color:var(--pink); text-transform:uppercase; }
+  .mode-mini-text .md { font-size:8px; color:rgba(255,255,255,0.4); }
+
+  /* Score mini */
+  .score-mini { padding:5px 10px; display:flex; justify-content:space-around; border-top:1px solid rgba(255,255,255,0.07); }
+  .pc-mini { display:flex; flex-direction:column; align-items:center; }
+  .pe-mini { font-size:12px; } .pn-mini { font-size:7px; color:rgba(255,255,255,0.35); } .ps-mini { font-family:var(--font-display); font-size:9px; color:#fff; }
+  .pc-mini.active .pn-mini { color:var(--teal); } .pc-mini.active .ps-mini { color:var(--teal); }
+
+  .action-mini { padding:6px 10px 10px; display:flex; gap:6px; }
+  .skip-mini { flex:1; background:rgba(255,255,255,0.07); border-radius:8px; padding:7px; text-align:center; font-size:9px; color:rgba(255,255,255,0.5); }
+  .correct-mini { flex:2; background:var(--teal); border-radius:8px; padding:7px; text-align:center; font-family:var(--font-display); font-size:8px; font-weight:900; color:#000; }
+  .roll-mini { margin:6px 10px 10px; background:linear-gradient(135deg,var(--purple),var(--blue)); border-radius:8px; padding:10px; text-align:center; font-family:var(--font-display); font-size:9px; font-weight:900; color:#fff; }
+
+  /* Win screen mini */
+  .win-mini { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:10px; gap:6px; }
+  .win-emoji { font-size:28px; }
+  .win-text { font-family:var(--font-display); font-size:9px; font-weight:900; color:var(--teal); text-align:center; }
+  .win-sub { font-size:8px; color:rgba(255,255,255,0.4); text-align:center; }
+  .win-btn { background:var(--teal); border-radius:8px; padding:7px 12px; font-family:var(--font-display); font-size:8px; font-weight:900; color:#000; }
+
+  /* Landing mini */
+  .landing-hero { padding:14px 12px 10px; text-align:center; }
+  .landing-h { font-family:var(--font-display); font-size:10px; font-weight:900; color:#fff; line-height:1.4; margin-bottom:4px; }
+  .landing-sub { font-size:8px; color:rgba(255,255,255,0.4); margin-bottom:8px; }
+  .landing-btns { display:flex; gap:5px; }
+  .landing-cta1 { flex:1; background:var(--teal); border-radius:7px; padding:7px; text-align:center; font-family:var(--font-display); font-size:7px; font-weight:900; color:#000; }
+  .landing-cta2 { flex:1; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); border-radius:7px; padding:7px; text-align:center; font-size:7px; color:rgba(255,255,255,0.6); }
+  .landing-section { padding:8px 12px; border-top:1px solid rgba(255,255,255,0.07); }
+  .landing-section-title { font-size:8px; font-weight:700; color:rgba(255,255,255,0.35); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:5px; }
+  .landing-cards-row { display:flex; gap:5px; }
+  .landing-type-chip { flex:1; border-radius:7px; padding:6px 4px; text-align:center; font-size:7px; font-weight:700; }
+
+  /* Setup screen */
+  .setup-body { flex:1; padding:10px; display:flex; flex-direction:column; gap:6px; }
+  .setup-title { font-family:var(--font-display); font-size:9px; font-weight:900; color:#fff; text-align:center; margin-bottom:4px; }
+  .setup-row { display:flex; align-items:center; gap:6px; background:rgba(255,255,255,0.06); border-radius:8px; padding:7px 8px; }
+  .setup-emoji { font-size:16px; }
+  .setup-input { flex:1; height:10px; background:rgba(255,255,255,0.15); border-radius:4px; }
+  .setup-add { background:rgba(255,255,255,0.08); border:1px dashed rgba(255,255,255,0.2); border-radius:8px; padding:7px; text-align:center; font-size:8px; color:rgba(255,255,255,0.35); }
+</style>
+</head>
+<body>
+
+<div class="page-title">Design — Section 2 of 3</div>
+<div class="section-title">Screens & Game Flow</div>
+<div class="section-sub">Every screen in the app, the game loop, and all page routes.</div>
+
+<!-- GAME FLOW -->
+<div class="card">
+  <h3 class="teal">Game Loop (Single Phone)</h3>
+  <div class="flow">
+    <div class="flow-step">
+      <div class="flow-left"><div class="flow-dot" style="background:rgba(104,81,158,0.4);color:#b39ddb;">1</div><div class="flow-line"></div></div>
+      <div class="flow-content">
+        <div class="flow-title">Player Setup</div>
+        <div class="flow-desc">Host opens /play. Adds 2–8 player names + picks emoji for each. Taps "Start Game". Deck is shuffled (75 cards, free tier shows first 25).</div>
+        <div class="flow-tags"><span class="ftag t">2–8 players</span><span class="ftag">emoji picker</span><span class="ftag">deck shuffle</span></div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-left"><div class="flow-dot" style="background:rgba(234,108,174,0.3);color:var(--pink);">2</div><div class="flow-line"></div></div>
+      <div class="flow-content">
+        <div class="flow-title">Roll Phase</div>
+        <div class="flow-desc">Current player's name shown. Phone passed to them. They tap "Roll & Draw" — die animates, random 1–6 result. A card PNG is drawn from the shuffled deck. Mode strip shows challenge type + explanation.</div>
+        <div class="flow-tags"><span class="ftag p">die animation</span><span class="ftag">card drawn</span><span class="ftag t">mode strip updates</span></div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-left"><div class="flow-dot" style="background:rgba(48,151,209,0.3);color:var(--blue);">3</div><div class="flow-line"></div></div>
+      <div class="flow-content">
+        <div class="flow-title">Reveal Phase</div>
+        <div class="flow-desc">Full card PNG displayed. Mode strip shows active die number highlighted. 60-second timer bar starts. Player performs the challenge. Host (or any player) taps Correct ✓ or Skip →.</div>
+        <div class="flow-tags"><span class="ftag">60s timer</span><span class="ftag t">card PNG shown</span><span class="ftag">correct / skip</span></div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-left"><div class="flow-dot" style="background:rgba(122,221,218,0.2);color:var(--teal);">4</div><div class="flow-line"></div></div>
+      <div class="flow-content">
+        <div class="flow-title">Score & Advance</div>
+        <div class="flow-desc">Correct → +1 point to current player. Score bar updates. Check if score ≥ 10 (cardsToWin). If yes → Winner screen. If no → next player, back to Roll Phase.</div>
+        <div class="flow-tags"><span class="ftag">+1 score pop animation</span><span class="ftag t">win check</span></div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-left"><div class="flow-dot" style="background:rgba(245,200,66,0.2);color:#F5C842;">5</div></div>
+      <div class="flow-content">
+        <div class="flow-title">Winner Screen</div>
+        <div class="flow-desc">Confetti animation. Winner name + emoji shown large. Final scores. Buttons: "Play Again" (reshuffle, same players) and "New Game" (back to setup).</div>
+        <div class="flow-tags"><span class="ftag">confetti</span><span class="ftag">final scores</span><span class="ftag">play again</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN WIREFRAMES -->
+<div class="card">
+  <h3 class="pink">Key Screens (Mobile Wireframes)</h3>
+  <div class="mini-phones">
+
+    <!-- Setup -->
+    <div>
+      <div style="font-size:9px;color:rgba(255,255,255,0.35);text-align:center;margin-bottom:6px;letter-spacing:0.1em;text-transform:uppercase;">Player Setup</div>
+      <div class="mini-phone">
+        <div class="mp-bar"><div class="mp-logo">GiGLz</div></div>
+        <div class="setup-body">
+          <div class="setup-title">Who's Playing?</div>
+          <div class="setup-row"><div class="setup-emoji">😎</div><div class="setup-input"></div></div>
+          <div class="setup-row"><div class="setup-emoji">🔥</div><div class="setup-input"></div></div>
+          <div class="setup-row"><div class="setup-emoji">⚡</div><div class="setup-input"></div></div>
+          <div class="setup-add">+ Add Player</div>
+          <div class="btn-mini btn-mini-purple" style="margin-top:auto;">START GAME →</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Roll phase -->
+    <div>
+      <div style="font-size:9px;color:rgba(255,255,255,0.35);text-align:center;margin-bottom:6px;letter-spacing:0.1em;text-transform:uppercase;">Roll Phase</div>
+      <div class="mini-phone">
+        <div class="mp-bar"><div class="mp-logo">GiGLz</div><div style="font-size:7px;background:var(--teal);color:#000;border-radius:10px;padding:2px 7px;font-weight:700;">🔓 Unlock</div></div>
+        <div style="text-align:center;padding:4px 10px 6px;"><div style="font-size:7px;color:rgba(122,221,218,0.5);letter-spacing:0.15em;text-transform:uppercase;">Current Player</div><div style="font-family:'Unbounded',sans-serif;font-size:12px;font-weight:900;background:linear-gradient(135deg,var(--teal),#fff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">😎 Sarah</div></div>
+        <div class="mode-mini" style="opacity:0.4;"><div class="die-mini" style="font-size:18px;background:rgba(255,255,255,0.1);">🎲</div><div class="mode-mini-text"><div class="mn" style="color:rgba(255,255,255,0.4);">Roll to find out...</div></div></div>
+        <div class="mp-body" style="padding:0 10px;">
+          <div style="flex:1;display:flex;align-items:center;justify-content:center;">
+            <div class="card-mini" style="width:110px;">
+              <div style="font-family:'Unbounded',sans-serif;font-size:7px;font-weight:900;background:linear-gradient(135deg,var(--teal),#fff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">GiGLz</div>
+              <div class="crow-mini"><span class="cn-mini">1</span><div><div class="cb-mini cbw">words</div><div class="cc-mini">GAS STATION</div></div></div>
+              <div class="crow-mini"><span class="cn-mini">2</span><div><div class="cb-mini cbt">cliché</div><div class="cc-mini">MADRID</div></div></div>
+              <div class="crow-mini"><span class="cn-mini">3</span><div><div class="cb-mini cba">assoc.</div><div class="cc-mini">MOTORWAY</div></div></div>
+              <div class="crow-mini"><span class="cn-mini">4</span><div><div class="cb-mini cbg">gesture</div><div class="cc-mini">TOUCH GRASS</div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="score-mini">
+          <div class="pc-mini active"><div class="pe-mini">😎</div><div class="pn-mini">Sarah</div><div class="ps-mini">3</div></div>
+          <div class="pc-mini"><div class="pe-mini">🔥</div><div class="pn-mini">Tom</div><div class="ps-mini">2</div></div>
+          <div class="pc-mini"><div class="pe-mini">⚡</div><div class="pn-mini">Jade</div><div class="ps-mini">1</div></div>
+        </div>
+        <div class="roll-mini">🎲 &nbsp;ROLL &amp; DRAW</div>
+      </div>
+    </div>
+
+    <!-- Reveal phase -->
+    <div>
+      <div style="font-size:9px;color:rgba(255,255,255,0.35);text-align:center;margin-bottom:6px;letter-spacing:0.1em;text-transform:uppercase;">Card Revealed</div>
+      <div class="mini-phone">
+        <div class="mp-bar"><div class="mp-logo">GiGLz</div><div style="font-size:7px;background:var(--teal);color:#000;border-radius:10px;padding:2px 7px;font-weight:700;">🔓 Unlock</div></div>
+        <div style="text-align:center;padding:4px 10px 6px;"><div style="font-size:7px;color:rgba(122,221,218,0.5);letter-spacing:0.15em;text-transform:uppercase;">Current Player</div><div style="font-family:'Unbounded',sans-serif;font-size:12px;font-weight:900;background:linear-gradient(135deg,var(--teal),#fff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">😎 Sarah</div></div>
+        <div class="mode-mini"><div class="die-mini">1</div><div class="mode-mini-text"><div class="mn">Words</div><div class="md">Explain without saying it!</div></div></div>
+        <div class="mp-body" style="padding:0 10px;">
+          <div style="flex:1;display:flex;align-items:center;justify-content:center;">
+            <div class="card-mini" style="width:110px;">
+              <div style="font-family:'Unbounded',sans-serif;font-size:7px;font-weight:900;background:linear-gradient(135deg,var(--teal),#fff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">GiGLz</div>
+              <div class="crow-mini active"><span class="cn-mini">1</span><div><div class="cb-mini cbw">words</div><div class="cc-mini">GAS STATION</div></div></div>
+              <div class="crow-mini" style="opacity:0.4;"><span class="cn-mini">2</span><div><div class="cb-mini cbt">cliché</div><div class="cc-mini">MADRID</div></div></div>
+              <div class="crow-mini" style="opacity:0.4;"><span class="cn-mini">3</span><div><div class="cb-mini cba">assoc.</div><div class="cc-mini">MOTORWAY</div></div></div>
+              <div class="crow-mini" style="opacity:0.4;"><span class="cn-mini">4</span><div><div class="cb-mini cbg">gesture</div><div class="cc-mini">TOUCH GRASS</div></div></div>
+            </div>
+          </div>
+        </div>
+        <!-- timer bar -->
+        <div style="margin:0 10px 4px;height:3px;background:rgba(255,255,255,0.1);border-radius:2px;"><div style="width:60%;height:100%;background:var(--teal);border-radius:2px;"></div></div>
+        <div class="score-mini">
+          <div class="pc-mini active"><div class="pe-mini">😎</div><div class="pn-mini">Sarah</div><div class="ps-mini">3</div></div>
+          <div class="pc-mini"><div class="pe-mini">🔥</div><div class="pn-mini">Tom</div><div class="ps-mini">2</div></div>
+          <div class="pc-mini"><div class="pe-mini">⚡</div><div class="pn-mini">Jade</div><div class="ps-mini">1</div></div>
+        </div>
+        <div class="action-mini"><div class="skip-mini">Skip →</div><div class="correct-mini">Correct ✓</div></div>
+      </div>
+    </div>
+
+    <!-- Winner -->
+    <div>
+      <div style="font-size:9px;color:rgba(255,255,255,0.35);text-align:center;margin-bottom:6px;letter-spacing:0.1em;text-transform:uppercase;">Winner Screen</div>
+      <div class="mini-phone">
+        <div class="mp-bar"><div class="mp-logo">GiGLz</div></div>
+        <div class="win-mini">
+          <div style="font-size:8px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.35);">Winner!</div>
+          <div class="win-emoji">😎</div>
+          <div style="font-family:'Unbounded',sans-serif;font-size:13px;font-weight:900;color:var(--teal);text-align:center;">Sarah</div>
+          <div style="font-size:8px;color:rgba(255,255,255,0.4);">with 10 points</div>
+          <div style="display:flex;flex-direction:column;gap:4px;width:100%;margin-top:6px;">
+            <div style="display:flex;justify-content:space-between;background:rgba(255,255,255,0.05);border-radius:6px;padding:5px 8px;"><span style="font-size:8px;">😎 Sarah</span><span style="font-family:'Unbounded',sans-serif;font-size:8px;color:var(--teal);">10</span></div>
+            <div style="display:flex;justify-content:space-between;background:rgba(255,255,255,0.05);border-radius:6px;padding:5px 8px;"><span style="font-size:8px;">🔥 Tom</span><span style="font-family:'Unbounded',sans-serif;font-size:8px;">7</span></div>
+            <div style="display:flex;justify-content:space-between;background:rgba(255,255,255,0.05);border-radius:6px;padding:5px 8px;"><span style="font-size:8px;">⚡ Jade</span><span style="font-family:'Unbounded',sans-serif;font-size:8px;">5</span></div>
+          </div>
+          <div class="win-btn" style="width:100%;text-align:center;margin-top:4px;">Play Again 🎲</div>
+          <div style="font-size:8px;color:rgba(255,255,255,0.3);text-align:center;cursor:pointer;">New Game</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ROUTES -->
+<div class="card">
+  <h3 class="blue">Page Routes</h3>
+  <div class="route-table">
+    <div class="route-row"><div class="route-path">/</div><div class="route-info"><div class="route-name">Landing Page</div><div class="route-desc">Hero · How it works · Challenge types · Reviews · Pricing preview · CTA</div></div><span class="route-badge rb-p1">Phase 1</span></div>
+    <div class="route-row"><div class="route-path">/play</div><div class="route-info"><div class="route-name">Free Game</div><div class="route-desc">Player setup → full game loop. 75 cards (free tier: first 25). No login required.</div></div><span class="route-badge rb-p1">Phase 1</span></div>
+    <div class="route-row"><div class="route-path">/login · /signup</div><div class="route-info"><div class="route-name">Auth Pages</div><div class="route-desc">Email + Google OAuth via Supabase Auth. Redirect back after login.</div></div><span class="route-badge rb-p1">Phase 1</span></div>
+    <div class="route-row"><div class="route-path">/pricing</div><div class="route-info"><div class="route-name">Pricing Page</div><div class="route-desc">Free / Plus €2.99 / Pro €5.99. Stripe Checkout on click.</div></div><span class="route-badge rb-p2">Phase 2</span></div>
+    <div class="route-row"><div class="route-path">/dashboard</div><div class="route-info"><div class="route-name">User Dashboard</div><div class="route-desc">Plan info · billing · game history · custom cards (Plus/Pro).</div></div><span class="route-badge rb-p2">Phase 2</span></div>
+    <div class="route-row"><div class="route-path">/room/new</div><div class="route-info"><div class="route-name">Create Room (Pro)</div><div class="route-desc">Host screen: room code, QR, waiting for players.</div></div><span class="route-badge rb-p3">Phase 3</span></div>
+    <div class="route-row"><div class="route-path">/room/[code]</div><div class="route-info"><div class="route-name">Join Room</div><div class="route-desc">Guest enters name → joins lobby → game starts when host taps Start. No login needed.</div></div><span class="route-badge rb-p3">Phase 3</span></div>
+  </div>
+</div>
+
+</body>
+</html>

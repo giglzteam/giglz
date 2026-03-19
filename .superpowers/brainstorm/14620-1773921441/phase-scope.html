@@ -1,0 +1,26 @@
+<h2>What are we building first?</h2>
+<p class="subtitle">The plan has 4 phases. Let's agree on the starting scope.</p>
+
+<div class="options">
+  <div class="option" data-choice="phase1-only" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Phase 1 — Core Game Only</h3>
+      <p>Scaffold the Next.js app, build the <code>&lt;GameCard&gt;</code> and <code>&lt;Die&gt;</code> components, wire the game engine, build <code>/play</code> and the landing page. Free game works end-to-end. No auth, no Supabase, no Stripe yet.</p>
+    </div>
+  </div>
+  <div class="option" data-choice="phase1-2" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Phase 1 + 2 — Game + Subscriptions</h3>
+      <p>Everything in Phase 1, plus Supabase auth, Stripe checkout, pricing page, and paywall gates. Someone can pay €2.99 by the end.</p>
+    </div>
+  </div>
+  <div class="option" data-choice="full" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Full Spec — All 4 Phases</h3>
+      <p>Design the complete system end-to-end (game + auth + subscriptions + multiplayer rooms + dashboard) before writing any code. Longer upfront, but complete picture.</p>
+    </div>
+  </div>
+</div>
