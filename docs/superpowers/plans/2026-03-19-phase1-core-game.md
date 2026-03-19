@@ -503,7 +503,7 @@ export interface GameState {
   deckIndex: number
   currentCardId: number | null
   dieValue: DieValue | null
-  phase: 'rolling' | 'reveal' | 'scoring' | 'finished'
+  phase: 'setup' | 'rolling' | 'reveal' | 'scoring' | 'finished'
   timerEnabled: boolean
   timerSeconds: number
   cardsToWin: number
