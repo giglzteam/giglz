@@ -1,0 +1,332 @@
+<style>
+  .grid3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    padding: 8px 0 24px;
+  }
+  .phone {
+    border-radius: 28px;
+    overflow: hidden;
+    background: #0d0f12;
+    border: 2px solid #1e2330;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    aspect-ratio: 9/19;
+    display: flex;
+    flex-direction: column;
+    font-family: system-ui, -apple-system, sans-serif;
+  }
+
+  /* shared card + row2 */
+  .ph-row2 {
+    background: #161b24; border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 8px; padding: 4px 7px;
+    display: flex; align-items: center; gap: 5px; margin: 0 10px 5px;
+  }
+  .ph-die {
+    width: 14px; height: 14px; border-radius: 3px; background: #EA6CAE;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 7px; font-weight: 900; color: #fff; flex-shrink: 0;
+    box-shadow: 0 0 6px #EA6CAE55;
+  }
+  .ph-lbl { font-size: 7px; font-weight: 900; text-transform: uppercase; color: #EA6CAE; flex-shrink: 0; }
+  .ph-sep { width: 1px; height: 8px; background: rgba(255,255,255,0.1); flex-shrink: 0; }
+  .ph-desc { font-size: 7px; color: rgba(255,255,255,0.45); flex: 1; min-width: 0; overflow: hidden; }
+  .ph-pname { font-size: 7px; font-weight: 700; color: #7ADDDA; flex-shrink: 0; }
+  .ph-card-area {
+    flex: 1; min-height: 0; padding: 0 10px 4px;
+    display: flex; align-items: center; justify-content: center; overflow: hidden;
+  }
+  .ph-card {
+    aspect-ratio: 5/7; height: 100%; max-width: 100%; border-radius: 12px;
+    background: linear-gradient(135deg, #1a1f2e, #14192a);
+    border: 1px solid rgba(255,255,255,0.08);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4); color: rgba(255,255,255,0.1); font-size: 8px;
+  }
+  .ph-timer { height: 3px; background: rgba(255,255,255,0.06); margin: 0 10px 0; border-radius: 99px; overflow: hidden; flex-shrink: 0; }
+  .ph-timer-fill { height: 100%; width: 55%; background: #7ADDDA; border-radius: 99px; box-shadow: 0 0 4px #7ADDDA88; }
+  .ph-btns { padding: 5px 10px 10px; flex-shrink: 0; display: flex; flex-direction: column; gap: 4px; }
+  .btn-c {
+    width: 100%; height: 26px; border-radius: 12px;
+    background: linear-gradient(135deg, #7ADDDA, #5bc8c5); color: #000;
+    font-size: 8px; font-weight: 900; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 16px rgba(122,221,218,0.35);
+  }
+  .btn-s {
+    width: 100%; height: 21px; border-radius: 10px;
+    background: #161b24; border: 1px solid rgba(255,255,255,0.09);
+    color: rgba(255,255,255,0.35); font-size: 7px;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* ── Option A: Ranked pills with position badge ── */
+  .row1-a {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 10px 5px; gap: 4px;
+  }
+  .top3-ranked {
+    display: flex; gap: 3px; flex: 1;
+  }
+  .ranked-chip {
+    display: flex; align-items: center; gap: 2px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 99px;
+    padding: 1px 5px 1px 2px;
+    flex: 1; min-width: 0;
+  }
+  .ranked-chip.first {
+    border-color: rgba(255,200,50,0.4);
+    background: rgba(255,200,50,0.07);
+  }
+  .rank-badge {
+    width: 13px; height: 13px; border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+    font-size: 6px; font-weight: 900;
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(255,255,255,0.4); flex-shrink: 0;
+  }
+  .rank-badge.gold { background: rgba(255,200,50,0.25); color: #ffc832; }
+  .rank-chip-name { font-size: 7px; font-weight: 600; color: rgba(255,255,255,0.55); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ranked-chip.first .rank-chip-name { color: rgba(255,255,255,0.85); }
+  .rank-chip-score { font-size: 7px; font-weight: 900; color: rgba(255,255,255,0.3); }
+  .ranked-chip.first .rank-chip-score { color: #ffc832; }
+  .ph-unlock-sm { font-size: 8px; color: rgba(255,255,255,0.2); flex-shrink: 0; }
+
+  /* active indicator */
+  .ranked-chip.active-turn {
+    border-color: rgba(122,221,218,0.4);
+    background: rgba(122,221,218,0.08);
+  }
+  .ranked-chip.active-turn .rank-chip-name { color: #7ADDDA; }
+
+  /* ── Option B: Podium-style with position stagger ── */
+  .row1-b {
+    display: flex; align-items: flex-end; justify-content: center;
+    padding: 8px 10px 4px; gap: 2px; position: relative;
+  }
+  .podium-player {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 1px; flex: 1;
+  }
+  .podium-player.p1 { order: 2; }
+  .podium-player.p2 { order: 1; }
+  .podium-player.p3 { order: 3; }
+  .podium-emoji { font-size: 11px; line-height: 1; }
+  .podium-emoji.big { font-size: 14px; }
+  .podium-name {
+    font-size: 7px; font-weight: 700;
+    color: rgba(255,255,255,0.5);
+    max-width: 36px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    text-align: center;
+  }
+  .podium-player.p1 .podium-name { color: rgba(255,255,255,0.9); }
+  .podium-score {
+    font-size: 9px; font-weight: 900; color: rgba(255,255,255,0.3);
+    font-family: 'SF Mono', monospace;
+  }
+  .podium-player.p1 .podium-score { font-size: 11px; color: #ffc832; }
+  .podium-bar {
+    width: 100%; border-radius: 3px 3px 0 0; margin-top: 2px;
+  }
+  .podium-player.p1 .podium-bar { height: 12px; background: rgba(255,200,50,0.25); border: 1px solid rgba(255,200,50,0.3); }
+  .podium-player.p2 .podium-bar { height: 8px; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1); }
+  .podium-player.p3 .podium-bar { height: 5px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.07); }
+  .podium-medal { font-size: 7px; opacity: 0.7; }
+  .ph-unlock-b { position: absolute; top: 8px; right: 10px; font-size: 8px; color: rgba(255,255,255,0.2); }
+
+  /* ── Option C: Leader spotlight + others compact ── */
+  .row1-c {
+    display: flex; align-items: center;
+    padding: 7px 10px 5px; gap: 5px;
+  }
+  .leader-block {
+    display: flex; align-items: center; gap: 4px;
+    background: rgba(255,200,50,0.07);
+    border: 1px solid rgba(255,200,50,0.25);
+    border-radius: 10px;
+    padding: 3px 7px 3px 4px;
+    flex-shrink: 0;
+  }
+  .leader-crown { font-size: 9px; }
+  .leader-emoji { font-size: 12px; }
+  .leader-info { display: flex; flex-direction: column; }
+  .leader-name { font-size: 8px; font-weight: 800; color: rgba(255,255,255,0.9); line-height: 1.2; }
+  .leader-score { font-size: 9px; font-weight: 900; color: #ffc832; line-height: 1; }
+  .others-stack { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+  .other-row {
+    display: flex; align-items: center; gap: 3px;
+  }
+  .other-pos { font-size: 6px; color: rgba(255,255,255,0.2); width: 8px; text-align: center; flex-shrink: 0; }
+  .other-emoji { font-size: 9px; }
+  .other-name { font-size: 7px; color: rgba(255,255,255,0.45); flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .other-score { font-size: 7px; font-weight: 700; color: rgba(255,255,255,0.25); }
+  .ph-unlock-c { font-size: 8px; color: rgba(255,255,255,0.2); flex-shrink: 0; }
+
+  .screen-option { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .screen-option .option { border: none; padding: 0; background: none; width: 100%; }
+  .screen-option .option .content { display: flex; flex-direction: column; align-items: center; gap: 6px; padding-top: 8px; }
+  .screen-option .option .content h3 { font-size: 13px; }
+  .screen-option .option .content p { font-size: 11px; text-align: center; line-height: 1.5; color: rgba(255,255,255,0.5); }
+</style>
+
+<h2>Top 3 Players — Row 1 Style</h2>
+<p class="subtitle">Logo removed. Three approaches to showcasing the leaderboard in the header. Active turn player is always highlighted in teal.</p>
+
+<div class="grid3">
+
+  <!-- Option A: Ranked pills -->
+  <div class="screen-option">
+    <div class="option" data-choice="a" onclick="toggleSelect(this)">
+      <div class="letter">A</div>
+      <div class="content">
+        <div class="phone">
+          <div class="row1-a">
+            <div class="top3-ranked">
+              <div class="ranked-chip first">
+                <div class="rank-badge gold">1</div>
+                <span class="rank-chip-name">Dhdh</span>
+                <span class="rank-chip-score">3</span>
+              </div>
+              <div class="ranked-chip active-turn">
+                <div class="rank-badge">2</div>
+                <span class="rank-chip-name">Sam</span>
+                <span class="rank-chip-score">2</span>
+              </div>
+              <div class="ranked-chip">
+                <div class="rank-badge">3</div>
+                <span class="rank-chip-name">Alex</span>
+                <span class="rank-chip-score">1</span>
+              </div>
+            </div>
+            <div class="ph-unlock-sm">🔓</div>
+          </div>
+          <div class="ph-row2">
+            <div class="ph-die">1</div><div class="ph-lbl">Words</div>
+            <div class="ph-sep"></div>
+            <div class="ph-desc">Explain without saying the word…</div>
+            <div class="ph-pname">Sam</div>
+          </div>
+          <div class="ph-card-area">
+            <div class="ph-card">🃏</div>
+          </div>
+          <div class="ph-timer"><div class="ph-timer-fill"></div></div>
+          <div class="ph-btns">
+            <div class="btn-c">✓ COMPLETE</div>
+            <div class="btn-s">Nobody got it →</div>
+          </div>
+        </div>
+        <h3>Ranked pills</h3>
+        <p>Position badge + name + score in three equal pills. Gold tint for #1. Active turn player in teal.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Option B: Podium -->
+  <div class="screen-option">
+    <div class="option" data-choice="b" onclick="toggleSelect(this)">
+      <div class="letter">B</div>
+      <div class="content">
+        <div class="phone">
+          <div class="row1-b">
+            <div class="ph-unlock-b">🔓</div>
+            <!-- 2nd place -->
+            <div class="podium-player p2">
+              <div class="podium-medal">🥈</div>
+              <div class="podium-emoji">🎯</div>
+              <div class="podium-name">Sam</div>
+              <div class="podium-score">2</div>
+              <div class="podium-bar"></div>
+            </div>
+            <!-- 1st place (centre, taller) -->
+            <div class="podium-player p1">
+              <div class="podium-medal">🥇</div>
+              <div class="podium-emoji big">😎</div>
+              <div class="podium-name">Dhdh</div>
+              <div class="podium-score">3</div>
+              <div class="podium-bar"></div>
+            </div>
+            <!-- 3rd place -->
+            <div class="podium-player p3">
+              <div class="podium-medal">🥉</div>
+              <div class="podium-emoji">🏆</div>
+              <div class="podium-name">Alex</div>
+              <div class="podium-score">1</div>
+              <div class="podium-bar"></div>
+            </div>
+          </div>
+          <div class="ph-row2">
+            <div class="ph-die">1</div><div class="ph-lbl">Words</div>
+            <div class="ph-sep"></div>
+            <div class="ph-desc">Explain without saying the word…</div>
+            <div class="ph-pname">Sam</div>
+          </div>
+          <div class="ph-card-area">
+            <div class="ph-card">🃏</div>
+          </div>
+          <div class="ph-timer"><div class="ph-timer-fill"></div></div>
+          <div class="ph-btns">
+            <div class="btn-c">✓ COMPLETE</div>
+            <div class="btn-s">Nobody got it →</div>
+          </div>
+        </div>
+        <h3>Podium</h3>
+        <p>2nd–1st–3rd layout with mini bars. #1 is centred and larger. Medal emojis make ranking immediately obvious.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Option C: Leader spotlight -->
+  <div class="screen-option">
+    <div class="option" data-choice="c" onclick="toggleSelect(this)">
+      <div class="letter">C</div>
+      <div class="content">
+        <div class="phone">
+          <div class="row1-c">
+            <div class="leader-block">
+              <div class="leader-crown">👑</div>
+              <div class="leader-emoji">😎</div>
+              <div class="leader-info">
+                <div class="leader-name">Dhdh</div>
+                <div class="leader-score">3 pts</div>
+              </div>
+            </div>
+            <div class="others-stack">
+              <div class="other-row">
+                <span class="other-pos">2</span>
+                <span class="other-emoji">🎯</span>
+                <span class="other-name">Sam</span>
+                <span class="other-score">2</span>
+              </div>
+              <div class="other-row">
+                <span class="other-pos">3</span>
+                <span class="other-emoji">🏆</span>
+                <span class="other-name">Alex</span>
+                <span class="other-score">1</span>
+              </div>
+            </div>
+            <div class="ph-unlock-c">🔓</div>
+          </div>
+          <div class="ph-row2">
+            <div class="ph-die">1</div><div class="ph-lbl">Words</div>
+            <div class="ph-sep"></div>
+            <div class="ph-desc">Explain without saying the word…</div>
+            <div class="ph-pname">Sam</div>
+          </div>
+          <div class="ph-card-area">
+            <div class="ph-card">🃏</div>
+          </div>
+          <div class="ph-timer"><div class="ph-timer-fill"></div></div>
+          <div class="ph-btns">
+            <div class="btn-c">✓ COMPLETE</div>
+            <div class="btn-s">Nobody got it →</div>
+          </div>
+        </div>
+        <h3>Leader spotlight</h3>
+        <p>Current leader gets a large highlighted block with a crown. #2 and #3 are compact rows beside it.</p>
+      </div>
+    </div>
+  </div>
+
+</div>

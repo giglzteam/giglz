@@ -1,0 +1,260 @@
+<style>
+  .layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 24px;
+    padding: 8px 20px 24px;
+    max-width: 780px;
+    margin: 0 auto;
+  }
+  .col { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .col-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,0.3); font-weight: 600; }
+  .phone {
+    border-radius: 30px; overflow: hidden; background: #0d0f12;
+    border: 1.5px solid #1e2330; box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+    aspect-ratio: 9/19; width: 100%;
+    display: flex; flex-direction: column;
+    font-family: system-ui, -apple-system, sans-serif; position: relative;
+  }
+
+  .row1 { display: flex; align-items: center; padding: 9px 11px 5px; gap: 4px; flex-shrink: 0; }
+  .top3 { display: flex; gap: 3px; flex: 1; min-width: 0; }
+  .rchip {
+    display: flex; align-items: center; gap: 2px;
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 99px; padding: 2px 5px 2px 2px; flex: 1; min-width: 0; overflow: hidden;
+  }
+  .rchip.gold { border-color: rgba(255,200,50,0.35); background: rgba(255,200,50,0.06); }
+  .rchip.turn { border-color: rgba(122,221,218,0.35); background: rgba(122,221,218,0.06); }
+  .rbadge {
+    width: 13px; height: 13px; border-radius: 50%; flex-shrink: 0;
+    background: rgba(255,255,255,0.07); font-size: 6px; font-weight: 900;
+    display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.35);
+  }
+  .rbadge.g { background: rgba(255,200,50,0.2); color: #ffc832; }
+  .rname { font-size: 7px; font-weight: 600; color: rgba(255,255,255,0.5); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .rchip.gold .rname { color: rgba(255,255,255,0.85); }
+  .rchip.turn .rname { color: #7ADDDA; }
+  .rscore { font-size: 7px; font-weight: 900; color: rgba(255,255,255,0.25); flex-shrink: 0; }
+  .rchip.gold .rscore { color: #ffc832; }
+  .rchip.turn .rscore { color: #7ADDDA; }
+  .unlock { font-size: 9px; color: rgba(255,255,255,0.2); flex-shrink: 0; }
+
+  .row2 {
+    background: #161b24; border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 8px; padding: 4px 8px; margin: 0 11px 5px;
+    display: flex; align-items: center; gap: 5px; flex-shrink: 0;
+  }
+  .die { width: 14px; height: 14px; border-radius: 3px; background: #EA6CAE; display: flex; align-items: center; justify-content: center; font-size: 7px; font-weight: 900; color: #fff; flex-shrink: 0; box-shadow: 0 0 6px #EA6CAE55; }
+  .clabel { font-size: 7px; font-weight: 900; text-transform: uppercase; color: #EA6CAE; flex-shrink: 0; }
+  .csep { width: 1px; height: 8px; background: rgba(255,255,255,0.1); flex-shrink: 0; }
+  .cdesc { font-size: 7px; color: rgba(255,255,255,0.4); flex: 1; min-width: 0; overflow: hidden; }
+  .cplayer { font-size: 7px; font-weight: 700; color: #7ADDDA; flex-shrink: 0; }
+
+  .card-area { flex: 1; min-height: 0; padding: 0 11px 4px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  .card {
+    aspect-ratio: 5/7; height: 100%; max-width: 100%; border-radius: 14px;
+    background: linear-gradient(135deg, #1a1f2e, #14192a);
+    border: 1px solid rgba(255,255,255,0.08);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.5);
+    color: rgba(255,255,255,0.1); font-size: 9px; text-align: center; line-height: 1.6;
+  }
+
+  .timer { height: 3px; background: rgba(255,255,255,0.06); margin: 0 11px; border-radius: 99px; overflow: hidden; flex-shrink: 0; }
+  .timer-fill { height: 100%; border-radius: 99px; }
+
+  .btns { padding: 5px 11px 11px; flex-shrink: 0; }
+
+  /* single full-width button — always this shape */
+  .btn-main {
+    width: 100%; height: 32px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center; gap: 5px;
+    font-size: 9px; font-weight: 900; letter-spacing: 0.8px;
+  }
+  .btn-roll {
+    background: linear-gradient(135deg, #6B4FA0, #3097D1);
+    color: #fff; box-shadow: 0 0 18px rgba(107,79,160,0.4);
+  }
+  .btn-complete {
+    background: linear-gradient(135deg, #7ADDDA, #5bc8c5);
+    color: #000; box-shadow: 0 0 18px rgba(122,221,218,0.4), inset 0 1px 0 rgba(255,255,255,0.25);
+  }
+
+  /* modal */
+  .overlay {
+    position: absolute; inset: 0;
+    background: rgba(0,0,0,0.75); backdrop-filter: blur(2px);
+    display: flex; align-items: center; justify-content: center; padding: 14px;
+  }
+  .modal {
+    background: #13181f; border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 18px; padding: 12px 10px 9px; width: 100%;
+    box-shadow: 0 12px 48px rgba(0,0,0,0.8);
+  }
+  .modal-title {
+    font-size: 8px; text-transform: uppercase; letter-spacing: 1.5px;
+    color: rgba(255,255,255,0.3); text-align: center; margin-bottom: 8px; font-weight: 700;
+  }
+  .prows { display: flex; flex-direction: column; gap: 3px; }
+  .prow {
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.09);
+    border-radius: 10px; padding: 0 9px; height: 28px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .prow-emoji { font-size: 12px; }
+  .prow-name { font-size: 9px; color: rgba(255,255,255,0.8); font-weight: 600; flex: 1; }
+  .prow-score { font-size: 8px; font-weight: 700; color: rgba(255,255,255,0.25); }
+
+  /* Nobody got it — inside modal, styled as a distinct skip row */
+  .nobody-row {
+    margin-top: 5px;
+    width: 100%; height: 26px; border-radius: 9px;
+    border: 1px solid rgba(255,255,255,0.07); background: transparent;
+    color: rgba(255,255,255,0.3); font-size: 7px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center; gap: 4px;
+  }
+  .nobody-row::before { content: '→'; opacity: 0.5; }
+
+  /* annotation */
+  .note {
+    max-width: 780px; margin: 0 auto; padding: 0 20px 8px;
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;
+  }
+  .nb {
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 10px; padding: 10px 12px;
+  }
+  .nb-t { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #7ADDDA; margin-bottom: 6px; }
+  .nb ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 4px; }
+  .nb li { font-size: 10px; color: rgba(255,255,255,0.5); display: flex; gap: 5px; line-height: 1.4; }
+  .nb li::before { content: '→'; color: rgba(122,221,218,0.6); flex-shrink: 0; font-size: 9px; }
+</style>
+
+<h2>Tweaked Design</h2>
+<p class="subtitle">One button at all times. Label changes on card draw. "Nobody got it" lives inside the modal.</p>
+
+<div class="layout">
+
+  <!-- State 1: Rolling -->
+  <div class="col">
+    <div class="col-label">1 — Rolling</div>
+    <div class="phone">
+      <div class="row1">
+        <div class="top3">
+          <div class="rchip gold"><div class="rbadge g">1</div><span class="rname">Dhdh</span><span class="rscore">2</span></div>
+          <div class="rchip turn"><div class="rbadge">2</div><span class="rname">Sam</span><span class="rscore">1</span></div>
+          <div class="rchip"><div class="rbadge">3</div><span class="rname">Alex</span><span class="rscore">0</span></div>
+        </div>
+        <div class="unlock">🔓</div>
+      </div>
+      <div class="row2" style="opacity:0.4;">
+        <div class="die" style="background:#555;box-shadow:none;">?</div>
+        <div class="clabel" style="color:rgba(255,255,255,0.3);">Roll to find out</div>
+      </div>
+      <div class="card-area">
+        <div class="card">back of<br/>card</div>
+      </div>
+      <div class="timer" style="opacity:0;height:3px;"></div>
+      <div class="btns">
+        <div class="btn-main btn-roll">🎲 &nbsp;ROLL &amp; DRAW</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- State 2: Card drawn, waiting -->
+  <div class="col">
+    <div class="col-label">2 — Card drawn</div>
+    <div class="phone">
+      <div class="row1">
+        <div class="top3">
+          <div class="rchip gold"><div class="rbadge g">1</div><span class="rname">Dhdh</span><span class="rscore">2</span></div>
+          <div class="rchip turn"><div class="rbadge">2</div><span class="rname">Sam</span><span class="rscore">1</span></div>
+          <div class="rchip"><div class="rbadge">3</div><span class="rname">Alex</span><span class="rscore">0</span></div>
+        </div>
+        <div class="unlock">🔓</div>
+      </div>
+      <div class="row2">
+        <div class="die">1</div>
+        <div class="clabel">Words</div>
+        <div class="csep"></div>
+        <div class="cdesc">Explain without saying…</div>
+        <div class="cplayer">Sam</div>
+      </div>
+      <div class="card-area">
+        <div class="card">🃏<br/>card</div>
+      </div>
+      <div class="timer"><div class="timer-fill" style="width:55%;background:#7ADDDA;box-shadow:0 0 5px #7ADDDA88;"></div></div>
+      <div class="btns">
+        <div class="btn-main btn-complete">✓ &nbsp;COMPLETE</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- State 3: Modal open -->
+  <div class="col">
+    <div class="col-label">3 — Picker open</div>
+    <div class="phone">
+      <div class="row1">
+        <div class="top3">
+          <div class="rchip gold"><div class="rbadge g">1</div><span class="rname">Dhdh</span><span class="rscore">2</span></div>
+          <div class="rchip turn"><div class="rbadge">2</div><span class="rname">Sam</span><span class="rscore">1</span></div>
+          <div class="rchip"><div class="rbadge">3</div><span class="rname">Alex</span><span class="rscore">0</span></div>
+        </div>
+        <div class="unlock">🔓</div>
+      </div>
+      <div class="row2">
+        <div class="die">1</div>
+        <div class="clabel">Words</div>
+        <div class="csep"></div>
+        <div class="cdesc">Explain without saying…</div>
+        <div class="cplayer">Sam</div>
+      </div>
+      <div class="card-area">
+        <div class="card">🃏<br/>card</div>
+      </div>
+      <div class="timer"><div class="timer-fill" style="width:55%;background:#7ADDDA;box-shadow:0 0 5px #7ADDDA88;"></div></div>
+      <div class="btns">
+        <div class="btn-main btn-complete">✓ &nbsp;COMPLETE</div>
+      </div>
+      <div class="overlay">
+        <div class="modal">
+          <div class="modal-title">Who guessed it?</div>
+          <div class="prows">
+            <div class="prow"><span class="prow-emoji">😎</span><span class="prow-name">Dhdh</span><span class="prow-score">2 pts</span></div>
+            <div class="prow"><span class="prow-emoji">🏆</span><span class="prow-name">Alex</span><span class="prow-score">0 pts</span></div>
+          </div>
+          <div class="nobody-row">Nobody got it</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="note">
+  <div class="nb">
+    <div class="nb-t">Rolling</div>
+    <ul>
+      <li>Single full-width purple→blue "Roll & Draw" button</li>
+      <li>Challenge bar greyed out (unknown die)</li>
+      <li>Card shows back / placeholder</li>
+    </ul>
+  </div>
+  <div class="nb">
+    <div class="nb-t">Card drawn</div>
+    <ul>
+      <li>Same button shape — now teal "Complete ✓"</li>
+      <li>Challenge bar reveals die + description</li>
+      <li>Timer ticks if enabled</li>
+    </ul>
+  </div>
+  <div class="nb">
+    <div class="nb-t">Modal open</div>
+    <ul>
+      <li>All other players as tappable rows</li>
+      <li>"Nobody got it" at bottom — skips without scoring</li>
+      <li>No Cancel needed — tapping outside closes</li>
+    </ul>
+  </div>
+</div>

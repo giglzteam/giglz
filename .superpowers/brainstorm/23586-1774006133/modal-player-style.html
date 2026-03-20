@@ -1,0 +1,356 @@
+<style>
+  .grid3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    padding: 8px 0 24px;
+  }
+  .phone {
+    border-radius: 28px;
+    overflow: hidden;
+    background: #0d0f12;
+    border: 2px solid #1e2330;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    aspect-ratio: 9/19;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    font-family: system-ui, -apple-system, sans-serif;
+  }
+  .ph-header {
+    padding: 8px 10px 4px;
+    flex-shrink: 0;
+  }
+  .ph-row1 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+  .ph-logo {
+    font-weight: 900;
+    font-size: 11px;
+    background: linear-gradient(to right, #7ADDDA, #EA6CAE);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .ph-chips { display: flex; gap: 3px; flex: 1; justify-content: center; }
+  .ph-chip {
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.04);
+    border-radius: 99px;
+    padding: 1px 5px;
+    font-size: 7px;
+    color: rgba(255,255,255,0.4);
+    white-space: nowrap;
+  }
+  .ph-chip.active {
+    border-color: rgba(122,221,218,0.45);
+    background: rgba(122,221,218,0.10);
+    color: #7ADDDA;
+    font-weight: 700;
+  }
+  .ph-unlock { font-size: 8px; color: rgba(255,255,255,0.2); }
+  .ph-row2 {
+    background: #161b24;
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 8px;
+    padding: 4px 7px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 2px;
+  }
+  .ph-die {
+    width: 14px; height: 14px; border-radius: 3px;
+    background: #EA6CAE;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 7px; font-weight: 900; color: #fff; flex-shrink: 0;
+    box-shadow: 0 0 6px #EA6CAE55;
+  }
+  .ph-label { font-size: 7px; font-weight: 900; text-transform: uppercase; color: #EA6CAE; flex-shrink: 0; }
+  .ph-sep { width: 1px; height: 8px; background: rgba(255,255,255,0.1); flex-shrink: 0; }
+  .ph-desc { font-size: 7px; color: rgba(255,255,255,0.45); flex: 1; min-width: 0; overflow: hidden; }
+  .ph-player { font-size: 7px; font-weight: 700; color: #7ADDDA; flex-shrink: 0; }
+
+  .ph-card-area {
+    flex: 1; min-height: 0;
+    padding: 4px 10px;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+  .ph-card {
+    aspect-ratio: 5/7; height: 100%; max-width: 100%;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #1a1f2e, #14192a);
+    border: 1px solid rgba(255,255,255,0.08);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  }
+  .ph-card-placeholder { text-align: center; color: rgba(255,255,255,0.12); font-size: 8px; }
+
+  .ph-timer { height: 3px; background: rgba(255,255,255,0.06); margin: 0 10px; border-radius: 99px; overflow: hidden; flex-shrink: 0; }
+  .ph-timer-fill { height: 100%; width: 60%; background: #7ADDDA; border-radius: 99px; box-shadow: 0 0 4px #7ADDDA88; }
+  .ph-btns { padding: 6px 10px 10px; flex-shrink: 0; }
+  .ph-btn-complete {
+    width: 100%; height: 26px; border-radius: 12px;
+    background: linear-gradient(135deg, #7ADDDA, #5bc8c5);
+    color: #000; font-size: 8px; font-weight: 900; letter-spacing: 0.5px;
+    display: flex; align-items: center; justify-content: center; gap: 3px;
+    box-shadow: 0 0 16px rgba(122,221,218,0.35);
+  }
+  .ph-btn-skip {
+    width: 100%; height: 22px; border-radius: 12px;
+    background: #161b24; border: 1px solid rgba(255,255,255,0.10);
+    color: rgba(255,255,255,0.4); font-size: 7px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    margin-top: 4px;
+  }
+
+  /* Modal overlay — shared */
+  .ph-overlay {
+    position: absolute; inset: 0;
+    background: rgba(0,0,0,0.72);
+    display: flex; align-items: center; justify-content: center;
+    padding: 12px;
+  }
+  .ph-modal {
+    background: #13181f;
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 16px;
+    padding: 10px 10px 8px;
+    width: 100%;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.7);
+  }
+  .ph-modal-title {
+    font-size: 7px; text-transform: uppercase; letter-spacing: 1px;
+    color: rgba(255,255,255,0.3); text-align: center; margin-bottom: 8px;
+    font-weight: 600;
+  }
+  .ph-modal-cancel {
+    width: 100%; height: 20px; border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.07);
+    color: rgba(255,255,255,0.25); font-size: 6px;
+    display: flex; align-items: center; justify-content: center;
+    margin-top: 5px;
+  }
+
+  /* Style A — Full-width rows */
+  .players-rows { display: flex; flex-direction: column; gap: 3px; }
+  .player-row {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    padding: 5px 8px;
+    display: flex; align-items: center; gap: 6px;
+    font-size: 8px; color: rgba(255,255,255,0.75);
+    height: 26px;
+  }
+  .player-row .emoji { font-size: 12px; }
+  .player-row .score { margin-left: auto; font-weight: 700; color: rgba(255,255,255,0.3); font-size: 7px; }
+
+  /* Style B — 2-col grid cards */
+  .players-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+  .player-tile {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 7px 5px;
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    font-size: 7px; color: rgba(255,255,255,0.7);
+  }
+  .player-tile .emoji { font-size: 14px; }
+  .player-tile .name { font-weight: 600; }
+  .player-tile .score { font-size: 6px; color: rgba(255,255,255,0.3); }
+
+  /* Style C — Compact pills row */
+  .players-pills {
+    display: flex; flex-wrap: wrap; gap: 4px; justify-content: center;
+  }
+  .player-pill {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 99px;
+    padding: 4px 9px;
+    display: flex; align-items: center; gap: 4px;
+    font-size: 8px; color: rgba(255,255,255,0.7);
+  }
+  .player-pill .emoji { font-size: 11px; }
+
+  .screen-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .screen-option .option {
+    border: none; padding: 0; background: none; width: 100%;
+  }
+  .screen-option .option .content {
+    display: flex; flex-direction: column; align-items: center; gap: 6px; padding-top: 8px;
+  }
+  .screen-option .option .content h3 { font-size: 13px; }
+  .screen-option .option .content p {
+    font-size: 11px; text-align: center; line-height: 1.5; color: rgba(255,255,255,0.5);
+  }
+</style>
+
+<h2>Modal — Player Button Style</h2>
+<p class="subtitle">You chose the center modal. How should the player options look inside it?</p>
+
+<div class="grid3">
+
+  <!-- Style A: Full-width rows -->
+  <div class="screen-option">
+    <div class="option" data-choice="a" onclick="toggleSelect(this)">
+      <div class="letter">A</div>
+      <div class="content">
+
+        <div class="phone">
+          <div class="ph-header">
+            <div class="ph-row1">
+              <div class="ph-logo">GiGLz</div>
+              <div class="ph-chips">
+                <div class="ph-chip active">😎·Dhdh·2</div>
+                <div class="ph-chip">🎯·Sam·1</div>
+                <div class="ph-chip">🏆·Alex·0</div>
+              </div>
+              <div class="ph-unlock">🔓</div>
+            </div>
+            <div class="ph-row2">
+              <div class="ph-die">1</div>
+              <div class="ph-label">Words</div>
+              <div class="ph-sep"></div>
+              <div class="ph-desc">Explain without saying the word…</div>
+              <div class="ph-player">Dhdh</div>
+            </div>
+          </div>
+          <div class="ph-card-area">
+            <div class="ph-card"><div class="ph-card-placeholder">🃏<br/>Card</div></div>
+          </div>
+          <div class="ph-timer"><div class="ph-timer-fill"></div></div>
+          <div class="ph-btns">
+            <div class="ph-btn-complete">✓ COMPLETE</div>
+            <div class="ph-btn-skip">Nobody got it →</div>
+          </div>
+          <div class="ph-overlay">
+            <div class="ph-modal">
+              <div class="ph-modal-title">Who guessed it?</div>
+              <div class="players-rows">
+                <div class="player-row"><span class="emoji">🎯</span>Sam<span class="score">1pt</span></div>
+                <div class="player-row"><span class="emoji">🏆</span>Alex<span class="score">0pt</span></div>
+              </div>
+              <div class="ph-modal-cancel">Cancel</div>
+            </div>
+          </div>
+        </div>
+
+        <h3>Full-width rows</h3>
+        <p>Tall tappable rows. Easy to hit, shows score context, reads like a list.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Style B: 2-col grid tiles -->
+  <div class="screen-option">
+    <div class="option" data-choice="b" onclick="toggleSelect(this)">
+      <div class="letter">B</div>
+      <div class="content">
+
+        <div class="phone">
+          <div class="ph-header">
+            <div class="ph-row1">
+              <div class="ph-logo">GiGLz</div>
+              <div class="ph-chips">
+                <div class="ph-chip active">😎·Dhdh·2</div>
+                <div class="ph-chip">🎯·Sam·1</div>
+                <div class="ph-chip">🏆·Alex·0</div>
+              </div>
+              <div class="ph-unlock">🔓</div>
+            </div>
+            <div class="ph-row2">
+              <div class="ph-die">1</div>
+              <div class="ph-label">Words</div>
+              <div class="ph-sep"></div>
+              <div class="ph-desc">Explain without saying the word…</div>
+              <div class="ph-player">Dhdh</div>
+            </div>
+          </div>
+          <div class="ph-card-area">
+            <div class="ph-card"><div class="ph-card-placeholder">🃏<br/>Card</div></div>
+          </div>
+          <div class="ph-timer"><div class="ph-timer-fill"></div></div>
+          <div class="ph-btns">
+            <div class="ph-btn-complete">✓ COMPLETE</div>
+            <div class="ph-btn-skip">Nobody got it →</div>
+          </div>
+          <div class="ph-overlay">
+            <div class="ph-modal">
+              <div class="ph-modal-title">Who guessed it?</div>
+              <div class="players-grid">
+                <div class="player-tile"><span class="emoji">🎯</span><span class="name">Sam</span><span class="score">1 pt</span></div>
+                <div class="player-tile"><span class="emoji">🏆</span><span class="name">Alex</span><span class="score">0 pt</span></div>
+              </div>
+              <div class="ph-modal-cancel">Cancel</div>
+            </div>
+          </div>
+        </div>
+
+        <h3>Grid tiles</h3>
+        <p>2-column tiles with emoji + name + score. Compact, visual, feels like picking a character.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Style C: Pill buttons -->
+  <div class="screen-option">
+    <div class="option" data-choice="c" onclick="toggleSelect(this)">
+      <div class="letter">C</div>
+      <div class="content">
+
+        <div class="phone">
+          <div class="ph-header">
+            <div class="ph-row1">
+              <div class="ph-logo">GiGLz</div>
+              <div class="ph-chips">
+                <div class="ph-chip active">😎·Dhdh·2</div>
+                <div class="ph-chip">🎯·Sam·1</div>
+                <div class="ph-chip">🏆·Alex·0</div>
+              </div>
+              <div class="ph-unlock">🔓</div>
+            </div>
+            <div class="ph-row2">
+              <div class="ph-die">1</div>
+              <div class="ph-label">Words</div>
+              <div class="ph-sep"></div>
+              <div class="ph-desc">Explain without saying the word…</div>
+              <div class="ph-player">Dhdh</div>
+            </div>
+          </div>
+          <div class="ph-card-area">
+            <div class="ph-card"><div class="ph-card-placeholder">🃏<br/>Card</div></div>
+          </div>
+          <div class="ph-timer"><div class="ph-timer-fill"></div></div>
+          <div class="ph-btns">
+            <div class="ph-btn-complete">✓ COMPLETE</div>
+            <div class="ph-btn-skip">Nobody got it →</div>
+          </div>
+          <div class="ph-overlay">
+            <div class="ph-modal">
+              <div class="ph-modal-title">Who guessed it?</div>
+              <div class="players-pills">
+                <div class="player-pill"><span class="emoji">🎯</span>Sam</div>
+                <div class="player-pill"><span class="emoji">🏆</span>Alex</div>
+              </div>
+              <div class="ph-modal-cancel">Cancel</div>
+            </div>
+          </div>
+        </div>
+
+        <h3>Pill buttons</h3>
+        <p>Compact horizontal pills, same style as score chips in the header. Minimal, consistent language.</p>
+      </div>
+    </div>
+  </div>
+
+</div>

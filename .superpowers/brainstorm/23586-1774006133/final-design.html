@@ -1,0 +1,295 @@
+<style>
+  .split2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    padding: 8px 40px 24px;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+  .phone-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  .phone-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: rgba(255,255,255,0.3);
+    font-weight: 600;
+  }
+  .phone {
+    border-radius: 32px;
+    overflow: hidden;
+    background: #0d0f12;
+    border: 1.5px solid #1e2330;
+    box-shadow: 0 12px 48px rgba(0,0,0,0.6);
+    aspect-ratio: 9/19;
+    width: 100%;
+    max-width: 200px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    font-family: system-ui, -apple-system, sans-serif;
+  }
+  .ph-header { padding: 10px 12px 5px; flex-shrink: 0; }
+  .ph-row1 {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 5px;
+  }
+  .ph-logo {
+    font-weight: 900; font-size: 13px;
+    background: linear-gradient(to right, #7ADDDA, #EA6CAE);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .ph-chips { display: flex; gap: 4px; flex: 1; justify-content: center; }
+  .ph-chip {
+    border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.04);
+    border-radius: 99px; padding: 2px 6px; font-size: 8px;
+    color: rgba(255,255,255,0.4); white-space: nowrap;
+  }
+  .ph-chip.active {
+    border-color: rgba(122,221,218,0.45); background: rgba(122,221,218,0.10);
+    color: #7ADDDA; font-weight: 700;
+  }
+  .ph-unlock { font-size: 9px; color: rgba(255,255,255,0.2); }
+  .ph-row2 {
+    background: #161b24; border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 9px; padding: 5px 8px;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .ph-die {
+    width: 16px; height: 16px; border-radius: 4px; background: #EA6CAE;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 8px; font-weight: 900; color: #fff; flex-shrink: 0;
+    box-shadow: 0 0 8px #EA6CAE55;
+  }
+  .ph-label { font-size: 8px; font-weight: 900; text-transform: uppercase; color: #EA6CAE; flex-shrink: 0; }
+  .ph-sep { width: 1px; height: 9px; background: rgba(255,255,255,0.1); flex-shrink: 0; }
+  .ph-desc { font-size: 8px; color: rgba(255,255,255,0.45); flex: 1; min-width: 0; overflow: hidden; }
+  .ph-player { font-size: 8px; font-weight: 700; color: #7ADDDA; flex-shrink: 0; }
+
+  .ph-card-area {
+    flex: 1; min-height: 0; padding: 5px 12px;
+    display: flex; align-items: center; justify-content: center; overflow: hidden;
+  }
+  .ph-card {
+    aspect-ratio: 5/7; height: 100%; max-width: 100%; border-radius: 14px;
+    background: linear-gradient(135deg, #1a1f2e, #14192a);
+    border: 1px solid rgba(255,255,255,0.08);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.5);
+    position: relative; overflow: hidden;
+  }
+  .ph-card-inner {
+    text-align: center; color: rgba(255,255,255,0.12); font-size: 9px; line-height: 1.6;
+  }
+  .ph-card-inner .card-emoji { font-size: 22px; display: block; margin-bottom: 4px; filter: grayscale(0.3); }
+
+  .ph-timer { height: 3px; background: rgba(255,255,255,0.06); margin: 0 12px; border-radius: 99px; overflow: hidden; flex-shrink: 0; }
+  .ph-timer-fill { height: 100%; width: 55%; background: #7ADDDA; border-radius: 99px; box-shadow: 0 0 5px #7ADDDA88; }
+
+  .ph-btns { padding: 6px 12px 12px; flex-shrink: 0; display: flex; flex-direction: column; gap: 5px; }
+
+  .btn-complete {
+    width: 100%; height: 32px; border-radius: 14px;
+    background: linear-gradient(135deg, #7ADDDA, #5bc8c5);
+    color: #000; font-size: 9px; font-weight: 900; letter-spacing: 0.8px;
+    display: flex; align-items: center; justify-content: center; gap: 4px;
+    box-shadow: 0 0 20px rgba(122,221,218,0.4), inset 0 1px 0 rgba(255,255,255,0.3);
+  }
+  .btn-skip {
+    width: 100%; height: 26px; border-radius: 12px;
+    background: #161b24; border: 1px solid rgba(255,255,255,0.10);
+    color: rgba(255,255,255,0.4); font-size: 8px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center; gap: 3px;
+  }
+
+  /* Modal */
+  .ph-overlay {
+    position: absolute; inset: 0;
+    background: rgba(0,0,0,0.75);
+    backdrop-filter: blur(2px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 14px;
+  }
+  .ph-modal {
+    background: #13181f;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 18px;
+    padding: 12px 10px 9px;
+    width: 100%;
+    box-shadow: 0 12px 48px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.04) inset;
+  }
+  .ph-modal-title {
+    font-size: 8px; text-transform: uppercase; letter-spacing: 1.5px;
+    color: rgba(255,255,255,0.3); text-align: center; margin-bottom: 9px;
+    font-weight: 700;
+  }
+  .players-rows { display: flex; flex-direction: column; gap: 4px; }
+  .player-row {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.09);
+    border-radius: 10px;
+    padding: 0 10px;
+    display: flex; align-items: center; gap: 7px;
+    height: 30px;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .player-row:hover { background: rgba(122,221,218,0.08); border-color: rgba(122,221,218,0.3); }
+  .player-row .emoji { font-size: 13px; }
+  .player-row .pname { font-size: 9px; color: rgba(255,255,255,0.8); font-weight: 600; flex: 1; }
+  .player-row .pscore { font-size: 8px; font-weight: 700; color: rgba(255,255,255,0.25); }
+  .ph-modal-cancel {
+    width: 100%; height: 22px; border-radius: 9px; margin-top: 5px;
+    border: 1px solid rgba(255,255,255,0.07);
+    color: rgba(255,255,255,0.25); font-size: 7px;
+    display: flex; align-items: center; justify-content: center;
+    background: transparent; cursor: pointer;
+  }
+
+  /* Annotation */
+  .annotations {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 0 40px 16px;
+  }
+  .annotation-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .ann-box {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 12px;
+    padding: 12px 14px;
+  }
+  .ann-title {
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 1px; color: #7ADDDA; margin-bottom: 8px;
+  }
+  .ann-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 5px; }
+  .ann-list li { font-size: 11px; color: rgba(255,255,255,0.55); display: flex; gap: 6px; align-items: flex-start; line-height: 1.4; }
+  .ann-list li::before { content: '→'; color: #7ADDDA; flex-shrink: 0; font-size: 10px; margin-top: 1px; }
+</style>
+
+<h2>Final Design — "Who guessed it?" Redesign</h2>
+<p class="subtitle">Two states: idle (card fully visible + single Complete button) and modal open (dimmed overlay with player rows).</p>
+
+<div class="split2">
+
+  <!-- State 1: Idle -->
+  <div class="phone-wrap">
+    <div class="phone-label">Before — Card in focus</div>
+    <div class="phone">
+      <div class="ph-header">
+        <div class="ph-row1">
+          <div class="ph-logo">GiGLz</div>
+          <div class="ph-chips">
+            <div class="ph-chip active">😎·Dhdh·2</div>
+            <div class="ph-chip">🎯·Sam·1</div>
+            <div class="ph-chip">🏆·Alex·0</div>
+          </div>
+          <div class="ph-unlock">🔓</div>
+        </div>
+        <div class="ph-row2">
+          <div class="ph-die">1</div>
+          <div class="ph-label">Words</div>
+          <div class="ph-sep"></div>
+          <div class="ph-desc">Explain without saying the word…</div>
+          <div class="ph-player">Dhdh</div>
+        </div>
+      </div>
+      <div class="ph-card-area">
+        <div class="ph-card">
+          <div class="ph-card-inner">
+            <span class="card-emoji">🃏</span>
+            card fills<br/>this space
+          </div>
+        </div>
+      </div>
+      <div class="ph-timer"><div class="ph-timer-fill"></div></div>
+      <div class="ph-btns">
+        <div class="btn-complete">✓ COMPLETE</div>
+        <div class="btn-skip">Nobody got it →</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- State 2: Modal open -->
+  <div class="phone-wrap">
+    <div class="phone-label">After — Picker modal</div>
+    <div class="phone">
+      <div class="ph-header">
+        <div class="ph-row1">
+          <div class="ph-logo">GiGLz</div>
+          <div class="ph-chips">
+            <div class="ph-chip active">😎·Dhdh·2</div>
+            <div class="ph-chip">🎯·Sam·1</div>
+            <div class="ph-chip">🏆·Alex·0</div>
+          </div>
+          <div class="ph-unlock">🔓</div>
+        </div>
+        <div class="ph-row2">
+          <div class="ph-die">1</div>
+          <div class="ph-label">Words</div>
+          <div class="ph-sep"></div>
+          <div class="ph-desc">Explain without saying the word…</div>
+          <div class="ph-player">Dhdh</div>
+        </div>
+      </div>
+      <div class="ph-card-area">
+        <div class="ph-card">
+          <div class="ph-card-inner">
+            <span class="card-emoji">🃏</span>
+            card fills<br/>this space
+          </div>
+        </div>
+      </div>
+      <div class="ph-timer"><div class="ph-timer-fill"></div></div>
+      <div class="ph-btns">
+        <div class="btn-complete">✓ COMPLETE</div>
+        <div class="btn-skip">Nobody got it →</div>
+      </div>
+      <div class="ph-overlay">
+        <div class="ph-modal">
+          <div class="ph-modal-title">Who guessed it?</div>
+          <div class="players-rows">
+            <div class="player-row"><span class="emoji">🎯</span><span class="pname">Sam</span><span class="pscore">1 pt</span></div>
+            <div class="player-row"><span class="emoji">🏆</span><span class="pname">Alex</span><span class="pscore">0 pt</span></div>
+          </div>
+          <div class="ph-modal-cancel">Cancel</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="annotations">
+  <div class="annotation-grid">
+    <div class="ann-box">
+      <div class="ann-title">Idle state</div>
+      <ul class="ann-list">
+        <li>Card fills the screen — full focus on the challenge</li>
+        <li>"Complete ✓" — teal glow button, triggers the modal</li>
+        <li>"Nobody got it →" — secondary skip stays outside the modal</li>
+        <li>Timer bar ticks above the buttons as before</li>
+      </ul>
+    </div>
+    <div class="ann-box">
+      <div class="ann-title">Modal open</div>
+      <ul class="ann-list">
+        <li>Dimmed + blurred overlay, card still legible behind</li>
+        <li>Full-width row per non-active player — emoji, name, current score</li>
+        <li>Tap a row → score that player + close modal instantly</li>
+        <li>Cancel → close without scoring</li>
+        <li>New component: <code style="font-size:10px;color:#7ADDDA">GuesserModal.tsx</code></li>
+      </ul>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,534 @@
+<!-- picker approach selection -->
+<style>
+  .screen-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    padding: 8px 0 24px;
+  }
+  .phone {
+    border-radius: 28px;
+    overflow: hidden;
+    background: #0d0f12;
+    border: 2px solid #1e2330;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    aspect-ratio: 9/19;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    font-family: system-ui, -apple-system, sans-serif;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .phone.selected-phone {
+    border-color: #7ADDDA;
+    box-shadow: 0 0 0 2px #7ADDDA44, 0 8px 32px rgba(0,0,0,0.5);
+  }
+  /* Header row */
+  .ph-header {
+    padding: 8px 10px 4px;
+    flex-shrink: 0;
+  }
+  .ph-row1 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+  .ph-logo {
+    font-weight: 900;
+    font-size: 11px;
+    background: linear-gradient(to right, #7ADDDA, #EA6CAE);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.3px;
+  }
+  .ph-chips {
+    display: flex;
+    gap: 3px;
+    flex: 1;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .ph-chip {
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.04);
+    border-radius: 99px;
+    padding: 1px 5px;
+    font-size: 7px;
+    color: rgba(255,255,255,0.4);
+    white-space: nowrap;
+  }
+  .ph-chip.active {
+    border-color: rgba(122,221,218,0.45);
+    background: rgba(122,221,218,0.10);
+    color: #7ADDDA;
+    font-weight: 700;
+  }
+  .ph-unlock {
+    font-size: 8px;
+    color: rgba(255,255,255,0.25);
+  }
+  .ph-row2 {
+    background: #161b24;
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 8px;
+    padding: 4px 7px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 2px;
+  }
+  .ph-die {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    background: #EA6CAE;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 7px;
+    font-weight: 900;
+    color: #fff;
+    flex-shrink: 0;
+    box-shadow: 0 0 6px #EA6CAE55;
+  }
+  .ph-label {
+    font-size: 7px;
+    font-weight: 900;
+    text-transform: uppercase;
+    color: #EA6CAE;
+    flex-shrink: 0;
+  }
+  .ph-sep { width: 1px; height: 8px; background: rgba(255,255,255,0.1); flex-shrink: 0; }
+  .ph-desc { font-size: 7px; color: rgba(255,255,255,0.45); flex: 1; min-width: 0; }
+  .ph-player { font-size: 7px; font-weight: 700; color: #7ADDDA; flex-shrink: 0; }
+
+  /* Card area */
+  .ph-card-area {
+    flex: 1;
+    min-height: 0;
+    padding: 4px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .ph-card {
+    aspect-ratio: 5/7;
+    height: 100%;
+    max-width: 100%;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #1a1f2e 0%, #14192a 100%);
+    border: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8px;
+    color: rgba(255,255,255,0.2);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    overflow: hidden;
+    position: relative;
+  }
+  .ph-card img { width: 100%; height: 100%; object-fit: cover; }
+  .ph-card-placeholder {
+    text-align: center;
+    color: rgba(255,255,255,0.15);
+    font-size: 7px;
+    padding: 8px;
+  }
+
+  /* Timer bar */
+  .ph-timer {
+    height: 3px;
+    background: rgba(255,255,255,0.06);
+    margin: 0 10px;
+    border-radius: 99px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .ph-timer-fill {
+    height: 100%;
+    width: 60%;
+    background: #7ADDDA;
+    border-radius: 99px;
+    box-shadow: 0 0 4px #7ADDDA88;
+  }
+
+  /* Buttons area */
+  .ph-btns {
+    padding: 6px 10px 10px;
+    flex-shrink: 0;
+  }
+
+  /* Option A — Single complete button */
+  .ph-btn-complete {
+    width: 100%;
+    height: 26px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #7ADDDA, #5bc8c5);
+    color: #000;
+    font-size: 8px;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    box-shadow: 0 0 16px rgba(122,221,218,0.35);
+  }
+  .ph-btn-skip {
+    width: 100%;
+    height: 22px;
+    border-radius: 12px;
+    background: #161b24;
+    border: 1px solid rgba(255,255,255,0.10);
+    color: rgba(255,255,255,0.4);
+    font-size: 7px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 4px;
+  }
+
+  /* Bottom sheet (Option A) */
+  .ph-sheet {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: #13181f;
+    border-top: 1px solid rgba(255,255,255,0.10);
+    border-radius: 16px 16px 0 0;
+    padding: 8px 10px 12px;
+    box-shadow: 0 -8px 32px rgba(0,0,0,0.5);
+  }
+  .ph-sheet-handle {
+    width: 24px;
+    height: 2px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 99px;
+    margin: 0 auto 7px;
+  }
+  .ph-sheet-title {
+    font-size: 7px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: rgba(255,255,255,0.3);
+    text-align: center;
+    margin-bottom: 6px;
+  }
+  .ph-sheet-players {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+  }
+  .ph-sheet-player {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    padding: 5px 6px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 8px;
+    color: rgba(255,255,255,0.7);
+  }
+  .ph-sheet-player .emoji { font-size: 10px; }
+
+  /* Center modal (Option B) */
+  .ph-modal-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.65);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+  .ph-modal {
+    background: #13181f;
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 16px;
+    padding: 10px;
+    width: 100%;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+  }
+  .ph-modal-title {
+    font-size: 7px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: rgba(255,255,255,0.3);
+    text-align: center;
+    margin-bottom: 8px;
+  }
+  .ph-modal-players {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+    margin-bottom: 6px;
+  }
+  .ph-modal-player {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    padding: 5px 6px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 8px;
+    color: rgba(255,255,255,0.7);
+  }
+  .ph-modal-cancel {
+    width: 100%;
+    height: 20px;
+    border-radius: 8px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.3);
+    font-size: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Inline expansion (Option C) */
+  .ph-inline-expand {
+    background: #13181f;
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 12px;
+    padding: 6px;
+    margin-top: 0;
+  }
+  .ph-inline-label {
+    font-size: 6px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: rgba(255,255,255,0.25);
+    text-align: center;
+    margin-bottom: 5px;
+  }
+  .ph-inline-players {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+    justify-content: center;
+    margin-bottom: 5px;
+  }
+  .ph-inline-player {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 99px;
+    padding: 3px 7px;
+    font-size: 7px;
+    color: rgba(255,255,255,0.65);
+    display: flex;
+    align-items: center;
+    gap: 3px;
+  }
+  .ph-inline-player .emoji { font-size: 9px; }
+  .ph-nobody {
+    width: 100%;
+    height: 18px;
+    border-radius: 8px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.3);
+    font-size: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .screen-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+  }
+  .screen-option .option {
+    border: none;
+    padding: 0;
+    background: none;
+    width: 100%;
+  }
+  .screen-option .option .content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding-top: 8px;
+  }
+  .screen-option .option .content h3 {
+    font-size: 13px;
+  }
+  .screen-option .option .content p {
+    font-size: 11px;
+    text-align: center;
+    line-height: 1.5;
+    color: rgba(255,255,255,0.5);
+  }
+</style>
+
+<h2>Who guessed it? — Picker Design</h2>
+<p class="subtitle">Three approaches for revealing the player picker. The card stays fully visible until the user taps "Complete".</p>
+
+<div class="screen-grid">
+
+  <!-- Option A: Bottom Sheet -->
+  <div class="screen-option">
+    <div class="option" data-choice="a" onclick="toggleSelect(this)">
+      <div class="letter">A</div>
+      <div class="content">
+
+        <div class="phone" id="phone-a">
+          <div class="ph-header">
+            <div class="ph-row1">
+              <div class="ph-logo">GiGLz</div>
+              <div class="ph-chips">
+                <div class="ph-chip active">😎 · Dhdh · 2</div>
+                <div class="ph-chip">🎯 · Sam · 1</div>
+                <div class="ph-chip">🏆 · Alex · 0</div>
+              </div>
+              <div class="ph-unlock">🔓</div>
+            </div>
+            <div class="ph-row2">
+              <div class="ph-die">1</div>
+              <div class="ph-label">Words</div>
+              <div class="ph-sep"></div>
+              <div class="ph-desc">Explain without saying the word…</div>
+              <div class="ph-player">Dhdh</div>
+            </div>
+          </div>
+          <div class="ph-card-area">
+            <div class="ph-card">
+              <div class="ph-card-placeholder">🃏<br/>Card</div>
+            </div>
+          </div>
+          <div class="ph-timer"><div class="ph-timer-fill"></div></div>
+          <div class="ph-btns">
+            <div class="ph-btn-complete">✓ COMPLETE</div>
+            <div class="ph-btn-skip">Nobody got it →</div>
+          </div>
+          <!-- Sheet open state -->
+          <div class="ph-sheet">
+            <div class="ph-sheet-handle"></div>
+            <div class="ph-sheet-title">Who guessed it?</div>
+            <div class="ph-sheet-players">
+              <div class="ph-sheet-player"><span class="emoji">🎯</span>Sam</div>
+              <div class="ph-sheet-player"><span class="emoji">🏆</span>Alex</div>
+            </div>
+          </div>
+        </div>
+
+        <h3>Bottom Sheet</h3>
+        <p>Single "Complete" button. Tap → sheet slides up from bottom with player names. Card stays visible behind the sheet.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Option B: Center Modal -->
+  <div class="screen-option">
+    <div class="option" data-choice="b" onclick="toggleSelect(this)">
+      <div class="letter">B</div>
+      <div class="content">
+
+        <div class="phone" id="phone-b">
+          <div class="ph-header">
+            <div class="ph-row1">
+              <div class="ph-logo">GiGLz</div>
+              <div class="ph-chips">
+                <div class="ph-chip active">😎 · Dhdh · 2</div>
+                <div class="ph-chip">🎯 · Sam · 1</div>
+                <div class="ph-chip">🏆 · Alex · 0</div>
+              </div>
+              <div class="ph-unlock">🔓</div>
+            </div>
+            <div class="ph-row2">
+              <div class="ph-die">1</div>
+              <div class="ph-label">Words</div>
+              <div class="ph-sep"></div>
+              <div class="ph-desc">Explain without saying the word…</div>
+              <div class="ph-player">Dhdh</div>
+            </div>
+          </div>
+          <div class="ph-card-area">
+            <div class="ph-card">
+              <div class="ph-card-placeholder">🃏<br/>Card</div>
+            </div>
+          </div>
+          <div class="ph-timer"><div class="ph-timer-fill"></div></div>
+          <div class="ph-btns">
+            <div class="ph-btn-complete">✓ COMPLETE</div>
+            <div class="ph-btn-skip">Nobody got it →</div>
+          </div>
+          <!-- Modal open state -->
+          <div class="ph-modal-overlay">
+            <div class="ph-modal">
+              <div class="ph-modal-title">Who guessed it?</div>
+              <div class="ph-modal-players">
+                <div class="ph-modal-player"><span class="emoji">🎯</span>Sam</div>
+                <div class="ph-modal-player"><span class="emoji">🏆</span>Alex</div>
+              </div>
+              <div class="ph-modal-cancel">Cancel</div>
+            </div>
+          </div>
+        </div>
+
+        <h3>Center Modal</h3>
+        <p>Dimmed overlay + centered dialog. Clean and standard. Card is fully obscured by the overlay.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Option C: Inline Expansion -->
+  <div class="screen-option">
+    <div class="option" data-choice="c" onclick="toggleSelect(this)">
+      <div class="letter">C</div>
+      <div class="content">
+
+        <div class="phone" id="phone-c">
+          <div class="ph-header">
+            <div class="ph-row1">
+              <div class="ph-logo">GiGLz</div>
+              <div class="ph-chips">
+                <div class="ph-chip active">😎 · Dhdh · 2</div>
+                <div class="ph-chip">🎯 · Sam · 1</div>
+                <div class="ph-chip">🏆 · Alex · 0</div>
+              </div>
+              <div class="ph-unlock">🔓</div>
+            </div>
+            <div class="ph-row2">
+              <div class="ph-die">1</div>
+              <div class="ph-label">Words</div>
+              <div class="ph-sep"></div>
+              <div class="ph-desc">Explain without saying the word…</div>
+              <div class="ph-player">Dhdh</div>
+            </div>
+          </div>
+          <div class="ph-card-area">
+            <div class="ph-card">
+              <div class="ph-card-placeholder">🃏<br/>Card</div>
+            </div>
+          </div>
+          <div class="ph-timer"><div class="ph-timer-fill"></div></div>
+          <div class="ph-btns">
+            <!-- Expanded inline picker -->
+            <div class="ph-inline-expand">
+              <div class="ph-inline-label">Who guessed it?</div>
+              <div class="ph-inline-players">
+                <div class="ph-inline-player"><span class="emoji">🎯</span>Sam</div>
+                <div class="ph-inline-player"><span class="emoji">🏆</span>Alex</div>
+              </div>
+              <div class="ph-nobody">Nobody got it →</div>
+            </div>
+          </div>
+        </div>
+
+        <h3>Inline Expansion</h3>
+        <p>Button area expands in place — no overlay. Players appear as compact pills right where the action buttons live.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
