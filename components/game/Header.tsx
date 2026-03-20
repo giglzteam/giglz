@@ -17,73 +17,83 @@ export function Header({ state, currentPlayerName, isPlusPro, onUnlock }: Header
 
   return (
     <div className="shrink-0">
-      {/* Row 1 — identity bar */}
+      {/* Row 1 — ranked leaderboard */}
       <div className="flex items-center justify-between px-4 pt-2 pb-1 gap-2">
-        <div className="font-display font-black text-lg bg-gradient-to-r from-teal to-pink bg-clip-text text-transparent">
-          GiGLz
-        </div>
-        <div className="flex-1 flex gap-1.5 justify-center overflow-x-auto scrollbar-none">
-          {state.mode === 'solo'
-            ? state.players.map((p, i) => {
-                const isActive = i === state.currentPlayer
-                return (
-                  <div
-                    key={p.name}
-                    className={`flex items-center gap-1 rounded-full px-2 py-0.5 border text-[10px] shrink-0 ${
-                      isActive
-                        ? 'border-teal/45 bg-teal/10 shadow-[0_0_10px_rgba(122,221,218,0.15)]'
-                        : 'border-white/10 bg-white/[0.06]'
-                    }`}
-                  >
-                    <span>{p.emoji}</span>
-                    <span className="text-white/30">·</span>
-                    <span
-                      className={`max-w-[48px] truncate ${
-                        isActive ? 'text-white' : 'text-[var(--text-muted)]'
+        <div className="flex-1 flex gap-1.5 overflow-x-auto scrollbar-none">
+          {(state.mode === 'solo'
+            ? [...state.players]
+                .map((p, i) => ({ name: p.name, score: p.score, emoji: p.emoji as string, originalIndex: i }))
+                .sort((a, b) => b.score - a.score)
+                .slice(0, 3)
+                .map((p, rank) => {
+                  const isLeader = rank === 0
+                  const isActiveTurn = !isLeader && p.originalIndex === state.currentPlayer
+                  return (
+                    <div
+                      key={p.name}
+                      className={`flex items-center gap-0.5 rounded-full px-2 py-0.5 border flex-1 min-w-0 overflow-hidden ${
+                        isLeader
+                          ? 'border-yellow-400/35 bg-yellow-400/[0.06]'
+                          : isActiveTurn
+                          ? 'border-teal/35 bg-teal/[0.06]'
+                          : 'border-white/8 bg-white/[0.04]'
                       }`}
                     >
-                      {p.name}
-                    </span>
-                    <span className="text-white/30">·</span>
-                    <span
-                      className={`font-display font-black ${
-                        isActive ? 'text-teal' : 'text-white/40'
+                      <div className={`w-[13px] h-[13px] rounded-full flex items-center justify-center text-[6px] font-black shrink-0 ${
+                        isLeader ? 'bg-yellow-400/20 text-yellow-400' : 'bg-white/7 text-white/35'
+                      }`}>
+                        {rank + 1}
+                      </div>
+                      <span className={`text-[7px] font-semibold flex-1 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap ${
+                        isLeader ? 'text-white/85' : isActiveTurn ? 'text-teal' : 'text-white/50'
+                      }`}>
+                        {p.name}
+                      </span>
+                      <span className={`text-[7px] font-black shrink-0 ${
+                        isLeader ? 'text-yellow-400' : isActiveTurn ? 'text-teal' : 'text-white/25'
+                      }`}>
+                        {p.score}
+                      </span>
+                    </div>
+                  )
+                })
+            : [...state.teams]
+                .map((t, i) => ({ name: t.name, score: t.score, originalIndex: i }))
+                .sort((a, b) => b.score - a.score)
+                .slice(0, 3)
+                .map((t, rank) => {
+                  const isLeader = rank === 0
+                  const isActiveTurn = !isLeader && t.originalIndex === state.currentTeam
+                  return (
+                    <div
+                      key={t.name}
+                      className={`flex items-center gap-0.5 rounded-full px-2 py-0.5 border flex-1 min-w-0 overflow-hidden ${
+                        isLeader
+                          ? 'border-yellow-400/35 bg-yellow-400/[0.06]'
+                          : isActiveTurn
+                          ? 'border-teal/35 bg-teal/[0.06]'
+                          : 'border-white/8 bg-white/[0.04]'
                       }`}
                     >
-                      {p.score}
-                    </span>
-                  </div>
-                )
-              })
-            : state.teams.map((t, i) => {
-                const isActive = i === state.currentTeam
-                return (
-                  <div
-                    key={t.name}
-                    className={`flex items-center gap-1 rounded-full px-2 py-0.5 border text-[10px] shrink-0 ${
-                      isActive
-                        ? 'border-teal/45 bg-teal/10 shadow-[0_0_10px_rgba(122,221,218,0.15)]'
-                        : 'border-white/10 bg-white/[0.06]'
-                    }`}
-                  >
-                    <span
-                      className={`max-w-[48px] truncate ${
-                        isActive ? 'text-white' : 'text-[var(--text-muted)]'
-                      }`}
-                    >
-                      {t.name}
-                    </span>
-                    <span className="text-white/30">·</span>
-                    <span
-                      className={`font-display font-black ${
-                        isActive ? 'text-teal' : 'text-white/40'
-                      }`}
-                    >
-                      {t.score}
-                    </span>
-                  </div>
-                )
-              })}
+                      <div className={`w-[13px] h-[13px] rounded-full flex items-center justify-center text-[6px] font-black shrink-0 ${
+                        isLeader ? 'bg-yellow-400/20 text-yellow-400' : 'bg-white/7 text-white/35'
+                      }`}>
+                        {rank + 1}
+                      </div>
+                      <span className={`text-[7px] font-semibold flex-1 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap ${
+                        isLeader ? 'text-white/85' : isActiveTurn ? 'text-teal' : 'text-white/50'
+                      }`}>
+                        {t.name}
+                      </span>
+                      <span className={`text-[7px] font-black shrink-0 ${
+                        isLeader ? 'text-yellow-400' : isActiveTurn ? 'text-teal' : 'text-white/25'
+                      }`}>
+                        {t.score}
+                      </span>
+                    </div>
+                  )
+                })
+          )}
         </div>
         {!isPlusPro && (
           <button
