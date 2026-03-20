@@ -95,15 +95,22 @@ export function drawCard(state: GameState): GameState {
   }
 }
 
-export function scoreCard(state: GameState): GameState {
+/**
+ * Award a point to a player/team.
+ * - Die 1–5: pass `scoringIndex` = the guesser's player/team index
+ * - Die 6 (Dare): omit `scoringIndex` — the performer (currentPlayer/currentTeam) scores
+ */
+export function scoreCard(state: GameState, scoringIndex?: number): GameState {
   if (state.mode === 'solo') {
+    const idx = scoringIndex ?? state.currentPlayer
     const players = state.players.map((p, i) =>
-      i === state.currentPlayer ? { ...p, score: p.score + 1 } : p
+      i === idx ? { ...p, score: p.score + 1 } : p
     )
     return { ...state, players, phase: 'scoring' }
   } else {
+    const idx = scoringIndex ?? state.currentTeam
     const teams = state.teams.map((t, i) =>
-      i === state.currentTeam ? { ...t, score: t.score + 1 } : t
+      i === idx ? { ...t, score: t.score + 1 } : t
     )
     return { ...state, teams, phase: 'scoring' }
   }

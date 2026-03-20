@@ -40,13 +40,17 @@ export default function PlayPage() {
     setCardCount(c => c + 1)
   }
 
-  function handleCorrect() {
+  function handleCorrect(scoringIndex?: number) {
     if (!gameState) return
-    const scored = scoreCard(gameState)
+    const scored = scoreCard(gameState, scoringIndex)
     const w = checkWin(scored)
     if (w) { setGameState(scored); setWinner(w); return }
     setGameState(nextTurn(scored))
-    setToast('Correct! +1 point')
+    const isDare = gameState.dieValue === 6
+    const name = isDare
+      ? (gameState.mode === 'solo' ? gameState.players[gameState.currentPlayer]?.name : gameState.teams[gameState.currentTeam]?.name)
+      : (gameState.mode === 'solo' && scoringIndex !== undefined ? gameState.players[scoringIndex]?.name : gameState.teams[scoringIndex ?? 0]?.name)
+    setToast(`${name} +1 🎉`)
   }
 
   function handleSkip() {
@@ -99,10 +103,39 @@ export default function PlayPage() {
             {!gameState.singleTaskMode && <Die value={gameState.dieValue} onRoll={handleRoll} />}
             <Button variant="roll" onClick={() => handleRoll(rollDie())}>🎲 &nbsp;ROLL &amp; DRAW</Button>
           </div>
-        ) : (
+        ) : isDare ? (
+          /* Die 6 — Dare: performer scores if they complete it */
           <div className="flex gap-3">
             <Button variant="skip" onClick={handleSkip}>Skip →</Button>
-            <Button variant="correct" onClick={handleCorrect}>Correct ✓</Button>
+            <Button variant="correct" onClick={() => handleCorrect()}>Done ✓</Button>
+          </div>
+        ) : (
+          /* Die 1–5: the guesser scores */
+          <div className="flex flex-col gap-3">
+            <p className="text-center text-[9px] uppercase tracking-widest text-[var(--text-muted)]">
+              Who guessed it?
+            </p>
+            <div className="flex flex-wrap gap-2 justify-center">
+              {gameState.mode === 'solo'
+                ? gameState.players
+                    .map((p, i) => ({ ...p, i }))
+                    .filter(p => p.i !== gameState.currentPlayer)
+                    .map(p => (
+                      <Button key={p.i} variant="correct" className="flex-none text-sm px-4" onClick={() => handleCorrect(p.i)}>
+                        {p.emoji} {p.name}
+                      </Button>
+                    ))
+                : gameState.teams
+                    .map((t, i) => ({ ...t, i }))
+                    .filter(t => t.i !== gameState.currentTeam)
+                    .map(t => (
+                      <Button key={t.i} variant="correct" className="flex-none text-sm px-4" onClick={() => handleCorrect(t.i)}>
+                        {t.name}
+                      </Button>
+                    ))
+              }
+            </div>
+            <Button variant="skip" onClick={handleSkip}>Nobody got it →</Button>
           </div>
         )}
       </div>
