@@ -176,6 +176,17 @@ Calls `onNobody()` which triggers `handleSkip()`.
 
 Tapping the overlay backdrop closes the modal (`onClose`) without scoring. No explicit Cancel button needed.
 
+The modal card itself must call `e.stopPropagation()` on its `onClick` to prevent taps inside the card from bubbling to the overlay and closing the modal:
+
+```tsx
+<div
+  className="bg-[#13181f] border border-white/12 rounded-[18px] p-3 w-full max-w-xs shadow-2xl"
+  onClick={(e) => e.stopPropagation()}
+>
+  ...
+</div>
+```
+
 ---
 
 ## State changes in `PlayGame.tsx`
@@ -203,9 +214,19 @@ Wire up:
 )}
 ```
 
-Close modal on `handleRollButton` call (guard: already in rolling state, but defensive):
+Close modal whenever the game advances to the next turn. Two paths must both close it:
+
+1. **`handleRollButton`** — called at the start of the next turn:
 ```ts
 setShowGuesserModal(false)
+```
+
+2. **`handleTimerExpire`** — timer expiry auto-advances the turn via `nextTurn(skipCard(...))`. Because `handleTimerExpire` uses a `useCallback` ref, add `setShowGuesserModal(false)` inside it:
+```ts
+const handleTimerExpire = useCallback(() => {
+  setShowGuesserModal(false)
+  setGameState(prev => prev ? nextTurn(skipCard(prev)) : prev)
+}, [])
 ```
 
 ---
