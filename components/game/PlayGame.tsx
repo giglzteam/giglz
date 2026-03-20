@@ -102,16 +102,16 @@ export function PlayGame({ isPlusPro }: PlayGameProps) {
         onUnlock={() => setShowPaywall(true)}
       />
 
-      <div className="flex-1 min-h-0 px-4 py-1 flex items-center justify-center overflow-hidden">
+      <div className="flex-1 min-h-0 px-4 md:px-6 py-1 md:py-3 flex items-center justify-center overflow-hidden">
         {/* Height-driven sizing: parent height → width via aspect-ratio, preventing overflow */}
-        <div className="h-full" style={{ aspectRatio: '5 / 7', maxWidth: 320 }}>
+        <div className="h-full max-w-full" style={{ aspectRatio: '5 / 7' }}>
           <GameCard cardId={gameState.currentCardId} />
         </div>
       </div>
 
       <TimerBar enabled={gameState.timerEnabled && gameState.phase === 'reveal' && !isDare} running={gameState.phase === 'reveal'} onExpire={handleTimerExpire} />
 
-      <div className="px-4 pt-2 pb-3 shrink-0">
+      <div className="px-4 md:px-8 pt-2 pb-3 md:pb-6 shrink-0">
         {gameState.phase === 'rolling' ? (
           <Button
             variant="roll"
