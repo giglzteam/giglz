@@ -1,5 +1,8 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
+import { CheckoutButton } from './CheckoutButton'
+
+interface PricingCardsProps { currentPlan?: 'free' | 'plus' | 'pro' }
 
 const PLANS = [
   {
@@ -89,7 +92,7 @@ function LockIcon() {
   )
 }
 
-export function PricingCards() {
+export function PricingCards({ currentPlan = 'free' }: PricingCardsProps) {
   return (
     <section
       id="pricing"
@@ -181,12 +184,23 @@ export function PricingCards() {
                 ))}
               </ul>
 
-              {/* CTA */}
-              <Link href={plan.ctaHref} className="mt-auto">
-                <Button variant={plan.ctaVariant} className="w-full">
-                  {plan.cta}
-                </Button>
-              </Link>
+              {/* CTA — Free stays as a Link; Plus/Pro use CheckoutButton */}
+              <div className="mt-auto">
+                {plan.name === 'Free' ? (
+                  <Link href="/play">
+                    <Button variant={plan.ctaVariant as 'secondary'} className="w-full">
+                      {plan.cta}
+                    </Button>
+                  </Link>
+                ) : (
+                  <CheckoutButton
+                    plan={plan.name.toLowerCase() as 'plus' | 'pro'}
+                    variant={plan.ctaVariant as 'primary' | 'pink'}
+                    label={plan.cta}
+                    disabled={currentPlan === plan.name.toLowerCase()}
+                  />
+                )}
+              </div>
             </div>
           ))}
         </div>
