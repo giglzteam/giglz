@@ -86,6 +86,7 @@ export function Header({ state, currentPlayerName, isPlusPro, onUnlock }: Header
         {!isPlusPro && (
           <button
             onClick={onUnlock}
+            aria-label="Unlock all"
             className="text-xs font-bold bg-teal text-black rounded-full px-3 py-1.5 shrink-0"
           >
             🔓
@@ -98,8 +99,7 @@ export function Header({ state, currentPlayerName, isPlusPro, onUnlock }: Header
         {!active ? (
           <>
             <div
-              className="w-6 h-6 rounded-md font-display font-black text-xs flex items-center justify-center shrink-0 opacity-40"
-              style={{ background: '#888' }}
+              className="w-6 h-6 rounded-md font-display font-black text-xs flex items-center justify-center shrink-0 opacity-40 bg-white/20"
             >
               ?
             </div>
