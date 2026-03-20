@@ -99,9 +99,12 @@ export default function PlayPage() {
 
       <div className="px-4 pt-2 pb-4">
         {gameState.phase === 'rolling' ? (
-          <div className="flex flex-col items-center gap-4">
-            {!gameState.singleTaskMode && <Die value={gameState.dieValue} onRoll={handleRoll} />}
-            <Button variant="roll" onClick={() => handleRoll(rollDie())}>🎲 &nbsp;ROLL &amp; DRAW</Button>
+          <div className="flex flex-col items-center gap-2">
+            {gameState.singleTaskMode ? (
+              <Button variant="roll" onClick={() => handleRoll(rollDie())}>Draw Card</Button>
+            ) : (
+              <Die value={gameState.dieValue} onRoll={handleRoll} />
+            )}
           </div>
         ) : isDare ? (
           /* Die 6 — Dare: performer scores if they complete it */
