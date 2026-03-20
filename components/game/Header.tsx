@@ -22,15 +22,16 @@ export function Header({ state, currentPlayerName, isPlusPro, onUnlock }: Header
         <div className="flex-1 flex gap-1.5 overflow-x-auto scrollbar-none">
           {(state.mode === 'solo'
             ? [...state.players]
-                .map((p, i) => ({ name: p.name, score: p.score, emoji: p.emoji as string, originalIndex: i }))
+                .map((p, i) => ({ name: p.name, score: p.score, emoji: p.emoji, originalIndex: i }))
                 .sort((a, b) => b.score - a.score)
                 .slice(0, 3)
                 .map((p, rank) => {
                   const isLeader = rank === 0
+                  // Gold takes precedence: leader chip uses gold styling even if they are also the active-turn player
                   const isActiveTurn = !isLeader && p.originalIndex === state.currentPlayer
                   return (
                     <div
-                      key={p.name}
+                      key={String(p.originalIndex)}
                       className={`flex items-center gap-0.5 rounded-full px-2 py-0.5 border flex-1 min-w-0 overflow-hidden ${
                         isLeader
                           ? 'border-yellow-400/35 bg-yellow-400/[0.06]'
@@ -63,10 +64,11 @@ export function Header({ state, currentPlayerName, isPlusPro, onUnlock }: Header
                 .slice(0, 3)
                 .map((t, rank) => {
                   const isLeader = rank === 0
+                  // Gold takes precedence: leader chip uses gold styling even if they are also the active-turn team
                   const isActiveTurn = !isLeader && t.originalIndex === state.currentTeam
                   return (
                     <div
-                      key={t.name}
+                      key={String(t.originalIndex)}
                       className={`flex items-center gap-0.5 rounded-full px-2 py-0.5 border flex-1 min-w-0 overflow-hidden ${
                         isLeader
                           ? 'border-yellow-400/35 bg-yellow-400/[0.06]'
