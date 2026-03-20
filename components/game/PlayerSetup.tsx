@@ -27,7 +27,7 @@ export function PlayerSetup({ isPlusPro, onStart }: PlayerSetupProps) {
   const [emojiPickerFor, setEmojiPickerFor] = useState<number | null>(null)
 
   function addPlayer() {
-    if (players.length >= (isPlusPro ? 12 : 4)) return
+    if (players.length >= (isPlusPro ? 20 : 6)) return
     setPlayers(p => [...p, { name: '', emoji: EMOJIS[p.length % EMOJIS.length] }])
   }
   function removePlayer(i: number) {
@@ -55,7 +55,7 @@ export function PlayerSetup({ isPlusPro, onStart }: PlayerSetupProps) {
         <div className="flex gap-2">
           <button onClick={() => setMode('solo')} className={`flex-1 py-3 rounded-2xl text-sm font-display font-black transition-all ${mode === 'solo' ? 'bg-purple text-white shadow-[0_0_20px_var(--purple-glow)]' : 'bg-surface2 text-[var(--text-secondary)] border border-[var(--border)]'}`}>Solo</button>
           <button onClick={() => isPlusPro && setMode('teams')} className={`flex-1 py-3 rounded-2xl text-sm font-display font-black transition-all relative ${mode === 'teams' ? 'bg-purple text-white shadow-[0_0_20px_var(--purple-glow)]' : 'bg-surface2 text-[var(--text-secondary)] border border-[var(--border)]'} ${!isPlusPro ? 'opacity-50' : ''}`}>
-            Teams {!isPlusPro && <span className="text-[8px] absolute top-1 right-2 text-pink">Plus</span>}
+            Teams {!isPlusPro && <span className="text-[8px] absolute top-1 right-2 font-display font-black text-pink">PLUS</span>}
           </button>
         </div>
       </div>
@@ -79,7 +79,7 @@ export function PlayerSetup({ isPlusPro, onStart }: PlayerSetupProps) {
               ))}
             </div>
           )}
-          {players.length < (isPlusPro ? 12 : 4) && (
+          {players.length < (isPlusPro ? 20 : 6) && (
             <button onClick={addPlayer} className="w-full py-2.5 rounded-xl border border-dashed border-[var(--border)] text-[var(--text-muted)] text-sm hover:border-[var(--border-hover)] transition-colors">+ Add Player</button>
           )}
         </div>
@@ -87,10 +87,16 @@ export function PlayerSetup({ isPlusPro, onStart }: PlayerSetupProps) {
 
       <div className="space-y-3">
         <div className="text-[9px] uppercase tracking-widest text-[var(--text-muted)] mb-1">Options</div>
-        <div className="flex items-center justify-between bg-surface2 border border-[var(--border)] rounded-2xl px-4 py-3">
-          <div><div className="text-sm font-semibold">60s Timer</div><div className="text-xs text-[var(--text-muted)]">Optional — not applied to Dares</div></div>
-          <button onClick={() => setTimerEnabled(t => !t)} className={`w-12 h-6 rounded-full transition-all relative ${timerEnabled ? 'bg-teal' : 'bg-surface3'}`}>
-            <span className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${timerEnabled ? 'left-7' : 'left-1'}`} />
+        <div className={`flex items-center justify-between bg-surface2 border border-[var(--border)] rounded-2xl px-4 py-3 ${!isPlusPro ? 'opacity-50' : ''}`}>
+          <div>
+            <div className="text-sm font-semibold flex items-center gap-2">
+              60s Timer
+              {!isPlusPro && <span className="text-[8px] font-display font-black text-pink">PLUS</span>}
+            </div>
+            <div className="text-xs text-[var(--text-muted)]">Optional — not applied to Dares</div>
+          </div>
+          <button onClick={() => isPlusPro && setTimerEnabled(t => !t)} className={`w-12 h-6 rounded-full transition-all relative ${timerEnabled && isPlusPro ? 'bg-teal' : 'bg-surface3'}`}>
+            <span className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${timerEnabled && isPlusPro ? 'left-7' : 'left-1'}`} />
           </button>
         </div>
         <div className="flex items-center justify-between bg-surface2 border border-[var(--border)] rounded-2xl px-4 py-3">
