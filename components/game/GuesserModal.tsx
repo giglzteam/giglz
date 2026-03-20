@@ -23,10 +23,10 @@ export function GuesserModal({ state, onScore, onNobody, onClose }: GuesserModal
       onClick={onClose}
     >
       <div
-        className="bg-[#13181f] border border-white/12 rounded-[18px] p-3 w-full max-w-xs shadow-2xl"
+        className="bg-[#13181f] border border-white/12 rounded-[18px] p-3 md:p-5 w-full max-w-xs md:max-w-sm shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <p className="text-[8px] uppercase tracking-[0.15em] font-bold text-white/30 text-center mb-2">
+        <p className="text-[8px] md:text-[10px] uppercase tracking-[0.15em] font-bold text-white/30 text-center mb-2">
           Who guessed it?
         </p>
 
@@ -35,18 +35,18 @@ export function GuesserModal({ state, onScore, onNobody, onClose }: GuesserModal
             <button
               key={p.index}
               onClick={() => onScore(p.index)}
-              className="flex items-center gap-2 h-[30px] px-3 rounded-[10px] bg-white/5 border border-white/[0.09] active:bg-teal/10 active:border-teal/30 w-full text-left"
+              className="flex items-center gap-2 h-[30px] md:h-[40px] px-3 md:px-4 rounded-[10px] bg-white/5 border border-white/[0.09] active:bg-teal/10 active:border-teal/30 w-full text-left"
             >
               {p.emoji && <span className="text-[13px]">{p.emoji}</span>}
-              <span className="text-[9px] font-semibold text-white/80 flex-1">{p.name}</span>
-              <span className="text-[8px] font-bold text-white/25">{p.score} pts</span>
+              <span className="text-[9px] md:text-[11px] font-semibold text-white/80 flex-1">{p.name}</span>
+              <span className="text-[8px] md:text-[10px] font-bold text-white/25">{p.score} pts</span>
             </button>
           ))}
         </div>
 
         <button
           onClick={onNobody}
-          className="mt-1 w-full h-[26px] rounded-[9px] border border-white/7 text-white/30 text-[7px] font-semibold flex items-center justify-center gap-1"
+          className="mt-1 w-full h-[26px] md:h-[34px] rounded-[9px] border border-white/7 text-white/30 text-[7px] md:text-[9px] font-semibold flex items-center justify-center gap-1"
         >
           → Nobody got it
         </button>
