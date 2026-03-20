@@ -37,15 +37,21 @@ Two changes that together keep the card as the undisputed hero of the screen:
 
 ### What changes
 
-The `GiGLz` logo `<div>` in `Header.tsx` Row 1 is replaced with three ranked chips showing the top 3 players/teams by score. The `🔓` unlock button remains on the right, unchanged.
+In `Header.tsx` Row 1, **two existing elements are removed and one is replaced**:
+
+1. **Remove** the `GiGLz` logo `<div>` (leftmost element).
+2. **Remove** the existing all-players chip container (`flex-1 flex gap-1.5 justify-center overflow-x-auto scrollbar-none` — the one that currently shows every player as a score chip).
+3. **Insert** a new ranked chip container in their place (takes the `flex-1` space the two removed elements occupied).
+
+The `🔓` unlock button remains on the right, unchanged.
 
 ### Ranked chip layout
 
 Row 1 wrapper stays: `flex items-center justify-between px-4 pt-2 pb-1 gap-2`
 
-Replace the logo with:
+New chip container (replaces logo + old chip container):
 ```
-flex-1 flex gap-1.5 overflow-x-auto scrollbar-none   ← same as current chip container
+flex-1 flex gap-1.5 overflow-x-auto scrollbar-none
 ```
 
 Each chip: `flex items-center gap-0.5 rounded-full px-2 py-0.5 border flex-1 min-w-0 overflow-hidden`
@@ -62,7 +68,7 @@ Chip zones (left to right):
 | State | Border | Background | Name colour | Score colour | Badge bg/colour |
 |-------|--------|------------|-------------|--------------|-----------------|
 | #1 (leader) | `border-yellow-400/35` | `bg-yellow-400/[0.06]` | `text-white/85` | `text-yellow-400` | `bg-yellow-400/20 text-yellow-400` |
-| Active turn | `border-teal/35` | `bg-teal/[0.06]` | `text-teal` | `text-teal` | `bg-white/7 text-white/35` |
+| Active turn | `border-teal/35` | `bg-teal/[0.06]` | `text-teal` | `text-teal` | `bg-white/7 text-white/35` — intentionally no glow shadow (keeps row compact) |
 | Default | `border-white/8` | `bg-white/[0.04]` | `text-white/50` | `text-white/25` | `bg-white/7 text-white/35` |
 
 **Note:** if the leader is also the active-turn player, `#1` styling takes precedence over active-turn teal.
@@ -216,12 +222,12 @@ Wire up:
 
 Close modal whenever the game advances to the next turn. Two paths must both close it:
 
-1. **`handleRollButton`** — called at the start of the next turn:
+1. **`handleRollButton`** — defensive reset at the top of the function (the modal should already be closed by the time the user can roll, but this guards against any state desync):
 ```ts
 setShowGuesserModal(false)
 ```
 
-2. **`handleTimerExpire`** — timer expiry auto-advances the turn via `nextTurn(skipCard(...))`. Because `handleTimerExpire` uses a `useCallback` ref, add `setShowGuesserModal(false)` inside it:
+2. **`handleTimerExpire`** — timer expiry auto-advances the turn while the modal may still be open (e.g. player forgot to tap). Add `setShowGuesserModal(false)` to the existing `useCallback`:
 ```ts
 const handleTimerExpire = useCallback(() => {
   setShowGuesserModal(false)
