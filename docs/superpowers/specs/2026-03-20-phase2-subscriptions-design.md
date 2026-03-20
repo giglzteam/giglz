@@ -13,6 +13,16 @@ Add Supabase Auth, Stripe subscriptions, a pricing page, and a minimal dashboard
 
 ---
 
+## Prerequisites
+
+Before any Phase 2 code can be tested end-to-end:
+
+1. **Install Stripe packages:** `npm install stripe @stripe/stripe-js`
+2. **`app/auth/callback/route.ts` does not yet exist** — it is the first file to create. The login and signup pages already redirect to `/auth/callback`, so users land on a 404 until this route is in place.
+3. **Populate `.env.local`** with Supabase + Stripe keys (see Environment Variables section).
+
+---
+
 ## Architecture
 
 ```
@@ -28,9 +38,10 @@ User → /dashboard → reads profile.plan → shows tier + manage link
 
 | File | Change |
 |------|--------|
-| `app/auth/callback/route.ts` | New — exchanges Supabase auth code for session cookie |
+| `app/auth/callback/route.ts` | New — **step 0**, exchanges Supabase auth code for session cookie |
 | `app/api/stripe/checkout/route.ts` | New — creates Stripe Checkout session |
 | `app/api/stripe/webhook/route.ts` | New — handles subscription lifecycle events |
+| `app/api/stripe/portal/route.ts` | New — creates Stripe Customer Portal session |
 | `lib/stripe/client.ts` | New — Stripe SDK init (server-only) |
 | `lib/stripe/plans.ts` | New — plan definitions (limits, Price IDs, features) |
 | `lib/supabase/getUserPlan.ts` | New — server utility: returns 'free' \| 'plus' \| 'pro' |
@@ -50,12 +61,12 @@ Auto-created via trigger on `auth.users` insert.
 
 ```sql
 create table profiles (
-  id                uuid primary key references auth.users(id) on delete cascade,
-  display_name      text,
-  avatar_emoji      text default '😎',
-  plan              text default 'free',
+  id                 uuid primary key references auth.users(id) on delete cascade,
+  display_name       text,
+  avatar_emoji       text default '😎',
+  plan               text default 'free',
   stripe_customer_id text,
-  created_at        timestamptz default now()
+  created_at         timestamptz default now()
 );
 
 -- Auto-create profile on signup
@@ -74,7 +85,7 @@ create trigger on_auth_user_created
 ```
 
 ### `subscriptions`
-Written by Stripe webhook only.
+Written by Stripe webhook only (via service role key — bypasses RLS by design).
 
 ```sql
 create table subscriptions (
@@ -115,11 +126,14 @@ create policy "Users read own profile"
 create policy "Users update own profile"
   on profiles for update using (auth.uid() = id);
 
+-- subscriptions: service role key bypasses RLS for webhook writes.
+-- No insert/update policy needed — only the webhook writes to this table.
 create policy "Users read own subscriptions"
   on subscriptions for select using (auth.uid() = user_id);
 
-create policy "Anyone can insert game session"
-  on game_sessions for insert with check (true);
+-- game_sessions: restrict insert so authenticated users cannot spoof another user_id
+create policy "Anyone can insert own game session"
+  on game_sessions for insert with check (auth.uid() = user_id OR user_id IS NULL);
 create policy "Users read own sessions"
   on game_sessions for select using (auth.uid() = user_id);
 ```
@@ -133,9 +147,9 @@ create policy "Users read own sessions"
 3. Supabase sends magic link / redirects to Google
 4. After auth, redirect to `/auth/callback?code=xxx`
 5. `route.ts` calls `supabase.auth.exchangeCodeForSession(code)`
-6. Session cookie set, user redirected to `/dashboard`
+6. Session cookie set; redirect to `next` param if present, else `/dashboard`
 
-**`app/auth/callback/route.ts`** — GET handler, uses server Supabase client, redirects to `/dashboard` on success or `/login?error=1` on failure.
+**`app/auth/callback/route.ts`** — GET handler, uses server Supabase client. Reads optional `next` query param (e.g. `/pricing`) and redirects there after session is set. Redirects to `/login?error=1` on failure.
 
 ---
 
@@ -143,14 +157,14 @@ create policy "Users read own sessions"
 
 ```
 POST /api/stripe/checkout { plan: 'plus' | 'pro' }
-  → verify user session (optional — allow checkout without account)
+  → read user session (optional — guest checkout supported)
   → stripe.checkout.sessions.create({
       mode: 'subscription',
       line_items: [{ price: STRIPE_PLUS_PRICE_ID, quantity: 1 }],
       success_url: /dashboard?upgraded=true,
       cancel_url: /pricing,
       customer_email: user?.email,
-      metadata: { userId: user?.id, plan }
+      metadata: { userId: user?.id ?? '', plan }
     })
   → return { url } → client redirects to Stripe hosted page
 ```
@@ -159,11 +173,19 @@ POST /api/stripe/checkout { plan: 'plus' | 'pro' }
 
 | Event | Action |
 |-------|--------|
-| `checkout.session.completed` | Upsert subscription row, set `profiles.plan` |
-| `customer.subscription.updated` | Update status + period end |
-| `customer.subscription.deleted` | Set `profiles.plan = 'free'`, update status |
+| `checkout.session.completed` | Resolve `userId`: use `metadata.userId` if present, else look up `profiles` by `stripe_customer_id`. Upsert subscription row, set `profiles.plan`. |
+| `customer.subscription.updated` | Update `status` + `current_period_end` |
+| `customer.subscription.deleted` | Set `profiles.plan = 'free'`, update `status = 'canceled'` |
 
-Webhook uses `SUPABASE_SERVICE_ROLE_KEY` (bypasses RLS) to update profiles.
+All webhook DB writes use `SUPABASE_SERVICE_ROLE_KEY` (bypasses RLS). `userId` fallback for guest checkouts: query `profiles` by `stripe_customer_id` from the Stripe customer object.
+
+**Known gap:** A user who subscribes as a guest and later creates an account will not have their subscription linked automatically. Resolving this is out of scope for Phase 2.
+
+---
+
+## Stripe Customer Portal
+
+`/api/stripe/portal` — POST handler. Requires authenticated session. Calls `stripe.billingPortal.sessions.create({ customer: profile.stripe_customer_id, return_url: /dashboard })` and returns the portal URL. Dashboard "Manage subscription" button POSTs to this route.
 
 ---
 
@@ -172,7 +194,8 @@ Webhook uses `SUPABASE_SERVICE_ROLE_KEY` (bypasses RLS) to update profiles.
 ```ts
 // lib/supabase/getUserPlan.ts
 // Server-only. Returns 'free' | 'plus' | 'pro'.
-// Falls back to 'free' if unauthenticated or profile missing.
+// Falls back to 'free' on any error: unauthenticated, profile missing,
+// or Supabase network failure. Never throws.
 export async function getUserPlan(): Promise<'free' | 'plus' | 'pro'>
 ```
 
@@ -194,13 +217,13 @@ Used in:
 Minimal for Phase 2:
 - Display name (from profile)
 - Current plan badge (Free / Plus / Pro)
-- If Plus/Pro: subscription renewal date + "Manage subscription" link (Stripe Customer Portal)
+- If Plus/Pro: subscription renewal date + "Manage subscription" button → POST `/api/stripe/portal`
 - If Free: upgrade CTA → `/pricing`
 - Play button → `/play`
 - Log out button → calls `supabase.auth.signOut()`, redirect to `/`
 
 ### `/play` update
-Convert to hybrid: server component wrapper reads plan, passes `isPlusPro: boolean` to existing client component. No structural changes to game logic.
+Convert to hybrid: server component wrapper reads plan via `getUserPlan()`, passes `isPlusPro: boolean` as prop to the existing `'use client'` game component. No structural changes to game logic.
 
 ---
 
@@ -208,8 +231,8 @@ Convert to hybrid: server component wrapper reads plan, passes `isPlusPro: boole
 
 CTA buttons change behaviour:
 - "Play Free" → `/play` (unchanged)
-- "Get Plus" / "Get Pro" → `POST /api/stripe/checkout` then redirect to returned `url`
-- If user not logged in → redirect to `/signup?next=checkout&plan=plus` first
+- "Get Plus" / "Get Pro" → `POST /api/stripe/checkout` then `window.location.href = url`
+- If user not logged in when clicking CTA → redirect to `/signup?next=/pricing` first. Auth callback reads the `next` param and redirects back to `/pricing` after login, where the user can click again to checkout.
 
 ---
 
@@ -240,4 +263,4 @@ NEXT_PUBLIC_APP_URL=https://giglz.org
 - Custom card editor
 - Game history UI
 - Resend email integration
-- Stripe customer portal (just a link for now)
+- Auto-linking guest subscriptions to later-created accounts
