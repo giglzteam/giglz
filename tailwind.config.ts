@@ -22,6 +22,15 @@ const config: Config = {
         display: ['Unbounded', 'sans-serif'],
         body: ['DM Sans', 'sans-serif'],
       },
+      keyframes: {
+        'slide-down': {
+          '0%': { opacity: '0', transform: 'translateX(-50%) translateY(-12px)' },
+          '100%': { opacity: '1', transform: 'translateX(-50%) translateY(0)' },
+        },
+      },
+      animation: {
+        'slide-down': 'slide-down 0.3s ease-out',
+      },
     },
   },
   plugins: [],
