@@ -71,6 +71,7 @@ export function Header({ state, currentPlayerName, isPlusPro, onUnlock }: Header
                     >
                       {t.name}
                     </span>
+                    <span className="text-white/30">·</span>
                     <span
                       className={`font-display font-black ${
                         isActive ? 'text-teal' : 'text-white/40'
