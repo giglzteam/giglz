@@ -30,7 +30,7 @@
 
 ---
 
-## 3. Brand & Design Systems
+## 3. Brand & Design System
 
 ### 3.1 Colour Tokens
 
