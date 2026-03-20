@@ -39,8 +39,8 @@ export function HeroSection() {
         </p>
 
         {/* Card mockup */}
-        <div className="w-full max-w-xs mx-auto pointer-events-none mb-8">
-          <GameCard cardId={42} faceUp />
+        <div className="w-full max-w-xs mx-auto mb-8">
+          <GameCard cardId={100} />
         </div>
 
         {/* CTAs */}
