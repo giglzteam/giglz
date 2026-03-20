@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Giglz Layout V2</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0d0820;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    gap: 48px;
+    padding: 32px 24px;
+    flex-wrap: wrap;
+  }
+
+  .phone {
+    width: 375px;
+    height: 667px;
+    background: #0d0820;
+    border-radius: 44px;
+    border: 2px solid rgba(122,221,218,0.25);
+    box-shadow: 0 0 60px rgba(122,221,218,0.08), 0 20px 60px rgba(0,0,0,0.6);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    flex-shrink: 0;
+  }
+  .phone-label {
+    text-align: center;
+    color: rgba(255,255,255,0.4);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .logo {
+    font-size: 16px; font-weight: 900;
+    background: linear-gradient(90deg, #7ADDDA, #EA6CAE);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    flex-shrink: 0;
+  }
+  .unlock-btn {
+    background: #7ADDDA; color: #000; border: none;
+    border-radius: 20px; padding: 5px 10px;
+    font-size: 10px; font-weight: 800; cursor: pointer; white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* Header */
+  .header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 16px 8px; gap: 8px;
+  }
+  .score-chips {
+    display: flex; gap: 5px; align-items: center;
+    flex: 1; overflow: hidden; justify-content: center;
+  }
+  .chip {
+    display: flex; align-items: center; gap: 3px;
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(122,221,218,0.1);
+    border-radius: 20px; padding: 3px 8px 3px 5px;
+    font-size: 11px; white-space: nowrap;
+  }
+  .chip.active {
+    border-color: rgba(122,221,218,0.45);
+    background: rgba(122,221,218,0.1);
+    box-shadow: 0 0 10px rgba(122,221,218,0.15);
+  }
+  .chip .score { font-weight: 800; color: #7ADDDA; font-size: 12px; }
+  .chip .score.dim { color: rgba(255,255,255,0.5); }
+
+  /* Challenge strip — now at TOP, below header */
+  .challenge-strip {
+    margin: 0 16px 6px;
+    background: #1e1640; border: 1px solid rgba(122,221,218,0.12);
+    border-radius: 12px; padding: 8px 12px 9px;
+  }
+  .strip-top {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 4px;
+  }
+  .die-badge-sm {
+    width: 28px; height: 28px; border-radius: 7px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 900;
+  }
+  .strip-label {
+    font-size: 11px; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .strip-player {
+    margin-left: auto;
+    font-size: 11px; font-weight: 700;
+    color: rgba(255,255,255,0.5);
+  }
+  .strip-player span { color: #7ADDDA; font-weight: 800; }
+  .strip-desc {
+    font-size: 12px; color: rgba(255,255,255,0.65); line-height: 1.45;
+    padding-left: 36px;
+  }
+
+  /* Card */
+  .card-area {
+    flex: 1; padding: 4px 16px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .card-mock {
+    border-radius: 20px; overflow: hidden;
+    box-shadow: 0 8px 40px rgba(48,151,209,0.3), 0 0 0 2px rgba(122,221,218,0.15);
+    background: linear-gradient(135deg, #1a4a8a 0%, #0d2a5e 100%);
+    display: flex; align-items: center; justify-content: center;
+    position: relative; height: 100%;
+    aspect-ratio: 5/7; max-width: 280px;
+  }
+  .card-bg-text {
+    font-size: 36px; font-weight: 900;
+    background: linear-gradient(90deg, #7ADDDA, #EA6CAE);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    opacity: 0.15; position: absolute;
+    font-family: system-ui;
+  }
+  .card-peek {
+    position: absolute; bottom: 12px;
+    background: rgba(0,0,0,0.5); backdrop-filter: blur(8px);
+    color: rgba(255,255,255,0.85); font-size: 10px; font-weight: 600;
+    padding: 4px 10px; border-radius: 20px;
+  }
+
+  /* Timer */
+  .timer-bar {
+    margin: 0 16px 4px;
+    height: 4px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden;
+  }
+  .timer-fill {
+    height: 100%; width: 60%; background: #7ADDDA;
+    box-shadow: 0 0 8px rgba(122,221,218,0.6); border-radius: 4px;
+  }
+
+  /* Buttons */
+  .buttons { padding: 4px 16px 16px; }
+  .btn-roll {
+    width: 100%; height: 48px; border-radius: 14px; border: none;
+    background: linear-gradient(135deg, #7ADDDA, #3097D1);
+    color: #000; font-size: 14px; font-weight: 900;
+    letter-spacing: 0.05em; cursor: pointer;
+  }
+
+  /* Annotations */
+  .annotation {
+    position: absolute; right: -118px;
+    display: flex; align-items: center; gap: 6px;
+    font-size: 10px; color: rgba(255,255,255,0.35);
+    white-space: nowrap; pointer-events: none;
+  }
+  .annotation::before { content: '←'; color: rgba(122,221,218,0.3); }
+  .annotation.hi { color: rgba(122,221,218,0.9); font-weight: 700; }
+  .annotation.hi::before { color: #7ADDDA; }
+
+  .col { display: flex; flex-direction: column; align-items: center; }
+  .note { margin-top: 12px; font-size: 11px; text-align: center; color: rgba(122,221,218,0.7); }
+</style>
+</head>
+<body>
+
+<!-- VARIANT A: challenge strip below header, above card -->
+<div class="col">
+  <div class="phone-label" style="color:rgba(122,221,218,0.8);">Mode info at top — full strip</div>
+  <div class="phone" style="position:relative;">
+
+    <div class="header" style="position:relative;">
+      <div class="logo">GiGLz</div>
+      <div class="score-chips">
+        <div class="chip active"><span>😎</span><span style="font-size:10px;color:rgba(255,255,255,0.8);">Dhdh</span><span class="score">2</span></div>
+        <div class="chip"><span>🎯</span><span style="font-size:10px;color:rgba(255,255,255,0.5);">Sam</span><span class="score dim">1</span></div>
+        <div class="chip"><span>🏆</span><span style="font-size:10px;color:rgba(255,255,255,0.5);">Alex</span><span class="score dim">0</span></div>
+      </div>
+      <button class="unlock-btn">🔓</button>
+      <div class="annotation" style="top:50%;transform:translateY(-50%)">~40px</div>
+    </div>
+
+    <!-- CHALLENGE STRIP — at top, below header -->
+    <div class="challenge-strip" style="position:relative;">
+      <div class="strip-top">
+        <div class="die-badge-sm" style="background:#EA6CAE;box-shadow:0 0 12px rgba(234,108,174,0.4);">6</div>
+        <div class="strip-label" style="color:#EA6CAE;">DARE</div>
+        <div class="strip-player">Performer: <span>Dhdh</span></div>
+      </div>
+      <div class="strip-desc">Do what the card says. Group decides if completed.</div>
+      <div class="annotation" style="top:50%;transform:translateY(-50%)">~52px</div>
+    </div>
+
+    <div class="card-area" style="position:relative;">
+      <div class="card-mock">
+        <div class="card-bg-text">giGLz</div>
+        <div class="card-peek">Tap to peek 👁</div>
+      </div>
+      <div class="annotation hi" style="top:50%;transform:translateY(-50%)">Card ~max size</div>
+    </div>
+
+    <div class="timer-bar"><div class="timer-fill"></div></div>
+
+    <div class="buttons" style="position:relative;">
+      <button class="btn-roll">🎲 &nbsp;ROLL &amp; DRAW</button>
+      <div class="annotation" style="top:50%;transform:translateY(-50%)">~64px</div>
+    </div>
+
+  </div>
+  <div class="note">Strip above card.<br>Description reads before you see the card.</div>
+</div>
+
+<!-- VARIANT B: challenge inline in header row (2-line header) -->
+<div class="col">
+  <div class="phone-label" style="color:rgba(122,221,218,0.8);">Mode info at top — in header</div>
+  <div class="phone" style="position:relative;">
+
+    <!-- 2-row header: row1 = logo + scores + unlock, row2 = challenge -->
+    <div style="padding: 10px 16px 6px; position:relative;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;">
+        <div class="logo">GiGLz</div>
+        <div class="score-chips">
+          <div class="chip active"><span>😎</span><span style="font-size:10px;color:rgba(255,255,255,0.8);">Dhdh</span><span class="score">2</span></div>
+          <div class="chip"><span>🎯</span><span style="font-size:10px;color:rgba(255,255,255,0.5);">Sam</span><span class="score dim">1</span></div>
+          <div class="chip"><span>🏆</span><span style="font-size:10px;color:rgba(255,255,255,0.5);">Alex</span><span class="score dim">0</span></div>
+        </div>
+        <button class="unlock-btn">🔓</button>
+      </div>
+      <!-- inline challenge row -->
+      <div style="display:flex;align-items:center;gap:7px;background:rgba(234,108,174,0.08);border:1px solid rgba(234,108,174,0.2);border-radius:9px;padding:5px 10px;">
+        <div style="width:22px;height:22px;border-radius:6px;background:#EA6CAE;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;flex-shrink:0;">6</div>
+        <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:#EA6CAE;flex-shrink:0;">DARE</div>
+        <div style="width:1px;height:12px;background:rgba(234,108,174,0.25);flex-shrink:0;"></div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.6);line-height:1.3;flex:1;">Do what the card says. Group decides if completed.</div>
+        <div style="font-size:10px;color:#7ADDDA;font-weight:700;flex-shrink:0;margin-left:4px;">Dhdh</div>
+      </div>
+      <div class="annotation" style="top:50%;transform:translateY(-50%)">~72px total</div>
+    </div>
+
+    <div class="card-area" style="position:relative;">
+      <div class="card-mock">
+        <div class="card-bg-text">giGLz</div>
+        <div class="card-peek">Tap to peek 👁</div>
+      </div>
+      <div class="annotation hi" style="top:50%;transform:translateY(-50%)">Card ~max size</div>
+    </div>
+
+    <div class="timer-bar"><div class="timer-fill"></div></div>
+
+    <div class="buttons" style="position:relative;">
+      <button class="btn-roll">🎲 &nbsp;ROLL &amp; DRAW</button>
+      <div class="annotation" style="top:50%;transform:translateY(-50%)">~64px</div>
+    </div>
+
+  </div>
+  <div class="note">Compact header with challenge<br>baked into a single bar.</div>
+</div>
+
+</body>
+</html>
