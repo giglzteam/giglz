@@ -3,7 +3,6 @@ import { useState, useCallback } from 'react'
 import { PlayerSetup, GameOptions } from '@/components/game/PlayerSetup'
 import { GameCard } from '@/components/game/GameCard'
 import { ModeStrip } from '@/components/game/ModeStrip'
-import { Die } from '@/components/game/Die'
 import { TimerBar } from '@/components/game/TimerBar'
 import { ScoreBar } from '@/components/game/ScoreBar'
 import { PaywallGate } from '@/components/game/PaywallGate'
@@ -19,6 +18,7 @@ export default function PlayPage() {
   const [toast, setToast] = useState<string | null>(null)
   const [cardCount, setCardCount] = useState(0)
   const [winner, setWinner] = useState<string | null>(null)
+  const [rolling, setRolling] = useState(false)
 
   const isPlusPro = false
   const cardLimit = isPlusPro ? ALL_CARD_IDS.length : FREE_CARD_LIMIT
@@ -38,6 +38,16 @@ export default function PlayPage() {
     const withDie: GameState = { ...gameState, dieValue: gameState.singleTaskMode ? gameState.singleTaskDie : dieValue }
     setGameState(drawCard(withDie))
     setCardCount(c => c + 1)
+  }
+
+  function handleRollButton() {
+    if (rolling || !gameState) return
+    if (cardCount >= cardLimit) { setShowPaywall(true); return }
+    setRolling(true)
+    setTimeout(() => {
+      setRolling(false)
+      handleRoll(rollDie())
+    }, 650)
   }
 
   function handleCorrect(scoringIndex?: number) {
@@ -99,13 +109,20 @@ export default function PlayPage() {
 
       <div className="px-4 pt-2 pb-4">
         {gameState.phase === 'rolling' ? (
-          <div className="flex flex-col items-center gap-2">
-            {gameState.singleTaskMode ? (
-              <Button variant="roll" onClick={() => handleRoll(rollDie())}>Draw Card</Button>
-            ) : (
-              <Die value={gameState.dieValue} onRoll={handleRoll} />
-            )}
-          </div>
+          <Button
+            variant="roll"
+            disabled={rolling}
+            onClick={handleRollButton}
+            className={rolling ? 'opacity-80' : ''}
+          >
+            <span
+              className={rolling ? 'animate-[die-roll_650ms_cubic-bezier(0.34,1.56,0.64,1)_forwards]' : ''}
+              style={{ display: 'inline-block' }}
+            >
+              🎲
+            </span>
+            &nbsp;{rolling ? 'ROLLING…' : 'ROLL & DRAW'}
+          </Button>
         ) : isDare ? (
           /* Die 6 — Dare: performer scores if they complete it */
           <div className="flex gap-3">
