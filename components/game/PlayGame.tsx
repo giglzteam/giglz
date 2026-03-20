@@ -34,6 +34,7 @@ export function PlayGame({ isPlusPro }: PlayGameProps) {
     setCardCount(0)
     setWinner(null)
     setShowPaywall(false)
+    setShowGuesserModal(false)
   }
 
   function handleRoll(dieValue: DieValue) {
@@ -64,7 +65,7 @@ export function PlayGame({ isPlusPro }: PlayGameProps) {
     const isDare = gameState.dieValue === 6
     const name = isDare
       ? (gameState.mode === 'solo' ? gameState.players[gameState.currentPlayer]?.name : gameState.teams[gameState.currentTeam]?.name)
-      : (gameState.mode === 'solo' && scoringIndex !== undefined ? gameState.players[scoringIndex]?.name : gameState.teams[scoringIndex ?? 0]?.name)
+      : (gameState.mode === 'solo' && scoringIndex !== undefined ? gameState.players[scoringIndex]?.name : gameState.teams[scoringIndex ?? 0]?.name) // scoringIndex is always defined for teams (GuesserModal always passes it)
     setToast(`${name} +1 🎉`)
   }
 
@@ -77,7 +78,7 @@ export function PlayGame({ isPlusPro }: PlayGameProps) {
     setShowGuesserModal(false)
     setGameState(prev => prev ? nextTurn(skipCard(prev)) : prev)
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
-  // setShowGuesserModal is a stable useState setter — safe to omit from deps
+  // setGameState is a stable useState setter — safe to omit from deps
 
   if (!gameState) return <PlayerSetup isPlusPro={isPlusPro} onStart={handleStart} />
   if (winner) return (
