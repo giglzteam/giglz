@@ -1,0 +1,15 @@
+{
+  "name": "Giglz",
+  "short_name": "Giglz",
+  "description": "The #1 Party Game for Students & House Parties",
+  "start_url": "/play",
+  "display": "standalone",
+  "background_color": "#0d0820",
+  "theme_color": "#7ADDDA",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
