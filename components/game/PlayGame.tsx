@@ -2,9 +2,8 @@
 import { useState, useCallback } from 'react'
 import { PlayerSetup, GameOptions } from '@/components/game/PlayerSetup'
 import { GameCard } from '@/components/game/GameCard'
-import { ModeStrip } from '@/components/game/ModeStrip'
 import { TimerBar } from '@/components/game/TimerBar'
-import { ScoreBar } from '@/components/game/ScoreBar'
+import { Header } from '@/components/game/Header'
 import { PaywallGate } from '@/components/game/PaywallGate'
 import { WinnerScreen } from '@/components/game/WinnerScreen'
 import { Button } from '@/components/ui/Button'
@@ -83,36 +82,30 @@ export function PlayGame({ isPlusPro }: PlayGameProps) {
   )
 
   const isDare = gameState.dieValue === 6
+  const team = gameState.teams[gameState.currentTeam]
   const currentPlayerName = gameState.mode === 'solo'
-    ? gameState.players[gameState.currentPlayer]?.name
-    : gameState.teams[gameState.currentTeam]?.players[gameState.teams[gameState.currentTeam]?.currentPlayerIndex]
+    ? gameState.players[gameState.currentPlayer]?.name ?? ''
+    : team?.players[team?.currentPlayerIndex] ?? ''
 
   return (
     <div className="h-dvh bg-bg flex flex-col overflow-hidden pb-[env(safe-area-inset-bottom)]">
-      <div className="flex items-center justify-between px-4 pt-3 pb-1 shrink-0">
-        <div className="font-display font-black text-lg bg-gradient-to-r from-teal to-pink bg-clip-text text-transparent">GiGLz</div>
-        <button onClick={() => setShowPaywall(true)} className="text-xs font-bold bg-teal text-black rounded-full px-3 py-1.5">🔓 Unlock All</button>
-      </div>
+      <Header
+        state={gameState}
+        currentPlayerName={currentPlayerName}
+        isPlusPro={isPlusPro}
+        onUnlock={() => setShowPaywall(true)}
+      />
 
-      <div className="text-center px-4 pb-1 shrink-0">
-        <div className="text-[9px] uppercase tracking-widest text-[var(--text-muted)] mb-0.5">
-          {gameState.mode === 'teams' ? `${gameState.teams[gameState.currentTeam]?.name} — Performer` : 'Current Player'}
-        </div>
-        <div className="font-display font-black text-xl bg-gradient-to-r from-teal to-white bg-clip-text text-transparent">{currentPlayerName}</div>
-      </div>
-
-      <ModeStrip dieValue={gameState.dieValue} singleTaskDie={gameState.singleTaskMode ? gameState.singleTaskDie : null} />
-
-      <div className="flex-1 min-h-0 px-4 py-2 flex items-center justify-center">
-        <div className="w-full" style={{ maxWidth: 320, aspectRatio: '5/7', maxHeight: '100%' }}>
+      <div className="flex-1 min-h-0 px-4 py-1 flex items-center justify-center overflow-hidden">
+        {/* Height-driven sizing: parent height → width via aspect-ratio, preventing overflow */}
+        <div className="h-full" style={{ aspectRatio: '5 / 7', maxWidth: 320 }}>
           <GameCard cardId={gameState.currentCardId} />
         </div>
       </div>
 
       <TimerBar enabled={gameState.timerEnabled && gameState.phase === 'reveal' && !isDare} running={gameState.phase === 'reveal'} onExpire={handleTimerExpire} />
-      <ScoreBar state={gameState} />
 
-      <div className="px-4 pt-1 pb-3 shrink-0">
+      <div className="px-4 pt-2 pb-3 shrink-0">
         {gameState.phase === 'rolling' ? (
           <Button
             variant="roll"
