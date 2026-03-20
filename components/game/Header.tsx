@@ -1,3 +1,5 @@
+'use client'
+
 import { GameState } from '@/lib/game/engine'
 import { DIE_MAP } from '@/lib/game/cards'
 
@@ -96,7 +98,7 @@ export function Header({ state, currentPlayerName, isPlusPro, onUnlock }: Header
 
       {/* Row 2 — challenge bar */}
       <div className="mx-4 mb-2 px-3 py-2 rounded-xl bg-surface2 border border-[var(--border)] flex items-center gap-2">
-        {!active ? (
+        {state.phase === 'rolling' ? (
           <>
             <div
               className="w-6 h-6 rounded-md font-display font-black text-xs flex items-center justify-center shrink-0 opacity-40 bg-white/20"
