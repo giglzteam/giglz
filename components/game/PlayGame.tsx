@@ -8,6 +8,7 @@ import { PaywallGate } from '@/components/game/PaywallGate'
 import { WinnerScreen } from '@/components/game/WinnerScreen'
 import { Button } from '@/components/ui/Button'
 import { Toast } from '@/components/ui/Toast'
+import { GuesserModal } from '@/components/game/GuesserModal'
 import { GameState, CreateGameOptions, createGame, rollDie, drawCard, scoreCard, skipCard, nextTurn, checkWin } from '@/lib/game/engine'
 import { ALL_CARD_IDS, FREE_CARD_LIMIT, DieValue } from '@/lib/game/cards'
 
@@ -22,6 +23,7 @@ export function PlayGame({ isPlusPro }: PlayGameProps) {
   const [cardCount, setCardCount] = useState(0)
   const [winner, setWinner] = useState<string | null>(null)
   const [rolling, setRolling] = useState(false)
+  const [showGuesserModal, setShowGuesserModal] = useState(false)
 
   const cardLimit = isPlusPro ? ALL_CARD_IDS.length : FREE_CARD_LIMIT
 
@@ -45,6 +47,7 @@ export function PlayGame({ isPlusPro }: PlayGameProps) {
   function handleRollButton() {
     if (rolling || !gameState) return
     if (cardCount >= cardLimit) { setShowPaywall(true); return }
+    setShowGuesserModal(false)
     setRolling(true)
     setTimeout(() => {
       setRolling(false)
@@ -71,8 +74,10 @@ export function PlayGame({ isPlusPro }: PlayGameProps) {
   }
 
   const handleTimerExpire = useCallback(() => {
+    setShowGuesserModal(false)
     setGameState(prev => prev ? nextTurn(skipCard(prev)) : prev)
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  // setShowGuesserModal is a stable useState setter — safe to omit from deps
 
   if (!gameState) return <PlayerSetup isPlusPro={isPlusPro} onStart={handleStart} />
   if (winner) return (
@@ -128,38 +133,23 @@ export function PlayGame({ isPlusPro }: PlayGameProps) {
             <Button variant="correct" onClick={() => handleCorrect()}>Done ✓</Button>
           </div>
         ) : (
-          /* Die 1–5: the guesser scores */
-          <div className="flex flex-col gap-3">
-            <p className="text-center text-[9px] uppercase tracking-widest text-[var(--text-muted)]">
-              Who guessed it?
-            </p>
-            <div className="flex flex-wrap gap-2 justify-center">
-              {gameState.mode === 'solo'
-                ? gameState.players
-                    .map((p, i) => ({ ...p, i }))
-                    .filter(p => p.i !== gameState.currentPlayer)
-                    .map(p => (
-                      <Button key={p.i} variant="correct" className="flex-none text-sm px-4" onClick={() => handleCorrect(p.i)}>
-                        {p.emoji} {p.name}
-                      </Button>
-                    ))
-                : gameState.teams
-                    .map((t, i) => ({ ...t, i }))
-                    .filter(t => t.i !== gameState.currentTeam)
-                    .map(t => (
-                      <Button key={t.i} variant="correct" className="flex-none text-sm px-4" onClick={() => handleCorrect(t.i)}>
-                        {t.name}
-                      </Button>
-                    ))
-              }
-            </div>
-            <Button variant="skip" onClick={handleSkip}>Nobody got it →</Button>
-          </div>
+          /* Die 1–5: tap Complete to open scorer picker */
+          <Button variant="correct" className="w-full" onClick={() => setShowGuesserModal(true)}>
+            ✓ COMPLETE
+          </Button>
         )}
       </div>
 
       {showPaywall && <PaywallGate onDismiss={() => setShowPaywall(false)} />}
       {toast && <Toast message={toast} onDismiss={() => setToast(null)} />}
+      {showGuesserModal && gameState && (
+        <GuesserModal
+          state={gameState}
+          onScore={(i) => { setShowGuesserModal(false); handleCorrect(i) }}
+          onNobody={() => { setShowGuesserModal(false); handleSkip() }}
+          onClose={() => setShowGuesserModal(false)}
+        />
+      )}
     </div>
   )
 }
