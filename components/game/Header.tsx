@@ -34,6 +34,7 @@ export function Header({ state, currentPlayerName, isPlusPro, onUnlock }: Header
                     }`}
                   >
                     <span>{p.emoji}</span>
+                    <span className="text-white/30">·</span>
                     <span
                       className={`max-w-[48px] truncate ${
                         isActive ? 'text-white' : 'text-[var(--text-muted)]'
@@ -41,6 +42,7 @@ export function Header({ state, currentPlayerName, isPlusPro, onUnlock }: Header
                     >
                       {p.name}
                     </span>
+                    <span className="text-white/30">·</span>
                     <span
                       className={`font-display font-black ${
                         isActive ? 'text-teal' : 'text-white/40'
