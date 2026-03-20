@@ -1,6 +1,9 @@
 import Stripe from 'stripe'
 import { SupabaseClient } from '@supabase/supabase-js'
 
+// Stripe 2024-06-20 includes current_period_end; newer SDK types removed it
+type SubscriptionWithPeriodEnd = Stripe.Subscription & { current_period_end: number }
+
 export async function handleWebhookEvent(
   event: Stripe.Event,
   supabase: SupabaseClient,
@@ -18,7 +21,7 @@ export async function handleWebhookEvent(
       if (!userId) return
 
       const plan = (session.metadata?.plan ?? 'plus') as 'plus' | 'pro'
-      const sub = await stripe.subscriptions.retrieve(session.subscription as string)
+      const sub = await stripe.subscriptions.retrieve(session.subscription as string) as unknown as SubscriptionWithPeriodEnd
 
       await supabase.from('subscriptions').upsert({
         user_id: userId,
@@ -37,7 +40,7 @@ export async function handleWebhookEvent(
     }
 
     case 'customer.subscription.updated': {
-      const sub = event.data.object as Stripe.Subscription
+      const sub = event.data.object as SubscriptionWithPeriodEnd
       await supabase.from('subscriptions').update({
         status: sub.status,
         current_period_end: new Date(sub.current_period_end * 1000).toISOString(),
