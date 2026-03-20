@@ -88,13 +88,13 @@ export function PlayGame({ isPlusPro }: PlayGameProps) {
     : gameState.teams[gameState.currentTeam]?.players[gameState.teams[gameState.currentTeam]?.currentPlayerIndex]
 
   return (
-    <div className="min-h-dvh bg-bg flex flex-col pb-[env(safe-area-inset-bottom)]">
-      <div className="flex items-center justify-between px-4 pt-4 pb-2">
+    <div className="h-dvh bg-bg flex flex-col overflow-hidden pb-[env(safe-area-inset-bottom)]">
+      <div className="flex items-center justify-between px-4 pt-3 pb-1 shrink-0">
         <div className="font-display font-black text-lg bg-gradient-to-r from-teal to-pink bg-clip-text text-transparent">GiGLz</div>
         <button onClick={() => setShowPaywall(true)} className="text-xs font-bold bg-teal text-black rounded-full px-3 py-1.5">🔓 Unlock All</button>
       </div>
 
-      <div className="text-center px-4 pb-2">
+      <div className="text-center px-4 pb-1 shrink-0">
         <div className="text-[9px] uppercase tracking-widest text-[var(--text-muted)] mb-0.5">
           {gameState.mode === 'teams' ? `${gameState.teams[gameState.currentTeam]?.name} — Performer` : 'Current Player'}
         </div>
@@ -103,14 +103,16 @@ export function PlayGame({ isPlusPro }: PlayGameProps) {
 
       <ModeStrip dieValue={gameState.dieValue} singleTaskDie={gameState.singleTaskMode ? gameState.singleTaskDie : null} />
 
-      <div className="flex-1 px-4 flex items-center justify-center">
-        <div className="w-full max-w-sm"><GameCard cardId={gameState.currentCardId} /></div>
+      <div className="flex-1 min-h-0 px-4 py-2 flex items-center justify-center">
+        <div className="w-full" style={{ maxWidth: 320, aspectRatio: '5/7', maxHeight: '100%' }}>
+          <GameCard cardId={gameState.currentCardId} />
+        </div>
       </div>
 
       <TimerBar enabled={gameState.timerEnabled && gameState.phase === 'reveal' && !isDare} running={gameState.phase === 'reveal'} onExpire={handleTimerExpire} />
       <ScoreBar state={gameState} />
 
-      <div className="px-4 pt-2 pb-4">
+      <div className="px-4 pt-1 pb-3 shrink-0">
         {gameState.phase === 'rolling' ? (
           <Button
             variant="roll"
