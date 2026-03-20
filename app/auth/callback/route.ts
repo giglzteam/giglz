@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
       const response = NextResponse.redirect(`${origin}${next}`)
       // Forward any cookies set by Supabase during the exchange
       for (const cookie of cookieStore.getAll()) {
-        response.cookies.set(cookie.name, cookie.value, cookie as any)
+        response.cookies.set(cookie)
       }
       return response
     }
