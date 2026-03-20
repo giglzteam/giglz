@@ -10,9 +10,9 @@ export function PaywallGate({ onDismiss }: PaywallGateProps) {
           <svg className="w-6 h-6 stroke-teal" fill="none" strokeWidth={2} viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         </div>
         <h2 className="font-display font-black text-lg mb-2">Keep the Party Going!</h2>
-        <p className="text-sm text-[var(--text-secondary)] mb-6 leading-relaxed">You&apos;ve played 15 free cards. Unlock all 75 cards and keep the laughs coming.</p>
+        <p className="text-sm text-[var(--text-secondary)] mb-6 leading-relaxed">Upgrade to Plus to unlock the full game.</p>
         <ul className="text-left space-y-2 mb-6">
-          {['All 75 cards', 'Team Play mode', 'Up to 12 players', 'Game history'].map(f => (
+          {['100 cards', 'Timer', 'Team mode', 'Unlimited players'].map(f => (
             <li key={f} className="flex items-center gap-3 text-sm text-[var(--text-secondary)]">
               <span className="w-4 h-4 rounded-full bg-teal/15 border border-teal/30 flex items-center justify-center text-[9px] text-teal font-bold shrink-0">✓</span>{f}
             </li>

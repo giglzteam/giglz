@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/Button'
 import { GameMode } from '@/lib/game/engine'
 import { DieValue, DIE_MAP } from '@/lib/game/cards'
+import { PaywallGate } from '@/components/game/PaywallGate'
 
 const EMOJIS = ['😎','🔥','⚡','🎮','🎉','🤩','😈','🦁','🐯','🦊','👾','🤖']
 
@@ -25,6 +26,7 @@ export function PlayerSetup({ isPlusPro, onStart }: PlayerSetupProps) {
   const [timerEnabled, setTimerEnabled] = useState(false)
   const [singleTaskDie, setSingleTaskDie] = useState<DieValue | null>(null)
   const [emojiPickerFor, setEmojiPickerFor] = useState<number | null>(null)
+  const [showPaywall, setShowPaywall] = useState(false)
 
   function addPlayer() {
     if (players.length >= (isPlusPro ? 20 : 6)) return
@@ -54,7 +56,7 @@ export function PlayerSetup({ isPlusPro, onStart }: PlayerSetupProps) {
         <div className="text-[9px] uppercase tracking-widest text-[var(--text-muted)] mb-2">Game Mode</div>
         <div className="flex gap-2">
           <button onClick={() => setMode('solo')} className={`flex-1 py-3 rounded-2xl text-sm font-display font-black transition-all ${mode === 'solo' ? 'bg-purple text-white shadow-[0_0_20px_var(--purple-glow)]' : 'bg-surface2 text-[var(--text-secondary)] border border-[var(--border)]'}`}>Solo</button>
-          <button onClick={() => isPlusPro && setMode('teams')} className={`flex-1 py-3 rounded-2xl text-sm font-display font-black transition-all relative ${mode === 'teams' ? 'bg-purple text-white shadow-[0_0_20px_var(--purple-glow)]' : 'bg-surface2 text-[var(--text-secondary)] border border-[var(--border)]'} ${!isPlusPro ? 'opacity-50' : ''}`}>
+          <button onClick={() => isPlusPro ? setMode('teams') : setShowPaywall(true)} className={`flex-1 py-3 rounded-2xl text-sm font-display font-black transition-all relative ${mode === 'teams' ? 'bg-purple text-white shadow-[0_0_20px_var(--purple-glow)]' : 'bg-surface2 text-[var(--text-secondary)] border border-[var(--border)]'} ${!isPlusPro ? 'opacity-50' : ''}`}>
             Teams {!isPlusPro && <span className="text-[8px] absolute top-1 right-2 font-display font-black text-pink">PLUS</span>}
           </button>
         </div>
@@ -95,7 +97,7 @@ export function PlayerSetup({ isPlusPro, onStart }: PlayerSetupProps) {
             </div>
             <div className="text-xs text-[var(--text-muted)]">Optional — not applied to Dares</div>
           </div>
-          <button onClick={() => isPlusPro && setTimerEnabled(t => !t)} className={`w-12 h-6 rounded-full transition-all relative ${timerEnabled && isPlusPro ? 'bg-teal' : 'bg-surface3'}`}>
+          <button onClick={() => isPlusPro ? setTimerEnabled(t => !t) : setShowPaywall(true)} className={`w-12 h-6 rounded-full transition-all relative ${timerEnabled && isPlusPro ? 'bg-teal' : 'bg-surface3'}`}>
             <span className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${timerEnabled && isPlusPro ? 'left-7' : 'left-1'}`} />
           </button>
         </div>
@@ -121,6 +123,8 @@ export function PlayerSetup({ isPlusPro, onStart }: PlayerSetupProps) {
       </div>
 
       <Button variant="roll" onClick={handleStart} disabled={players.filter(p => p.name.trim()).length < 2} className="mt-auto">START GAME →</Button>
+
+      {showPaywall && <PaywallGate onDismiss={() => setShowPaywall(false)} />}
     </div>
   )
 }
